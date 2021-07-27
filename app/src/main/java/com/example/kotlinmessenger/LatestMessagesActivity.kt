@@ -9,6 +9,7 @@ import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kotlinmessenger.NewMessageActivity.Companion.USER_KEY
 import com.example.kotlinmessenger.databinding.ActivityLatestMessagesBinding
 import com.example.kotlinmessenger.databinding.LatestMessageRowBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -41,6 +42,13 @@ class LatestMessagesActivity : AppCompatActivity() {
         // カード間にボーダー
         recycler_latest_messages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
+        adapter.setOnItemClickListener { item, view ->
+            val row = item as LatestMessageRow
+            val intent = Intent(this, ChatLogActivity::class.java)
+            intent.putExtra(USER_KEY, row.chatPartnerUser)
+            startActivity(intent)
+        }
+
         listenForLatestMessages()
 
         fetchCurrentUser()
@@ -48,45 +56,6 @@ class LatestMessagesActivity : AppCompatActivity() {
         verifyUserIsLoggedIn()
     }
 
-    class LatestMessageRow(val chatMessage: ChatMessage): BindableItem<LatestMessageRowBinding>() {
-        override fun bind(viewBinding: LatestMessageRowBinding, position: Int) {
-            viewBinding.messageTextviewLatestMessager.text = chatMessage.text
-
-            val chatPartnerId: String
-            Log.d("listenForLatestMessages", "text: ${chatMessage.text}")
-            Log.d("listenForLatestMessages", "fromid: ${chatMessage.fromId}")
-            Log.d("listenForLatestMessages", "loginuser: ${FirebaseAuth.getInstance().uid}")
-            if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-                chatPartnerId = chatMessage.toId
-            } else {
-                chatPartnerId = chatMessage.fromId
-            }
-
-            Log.d("listenForLatestMessages", "chatPartnerId: $chatPartnerId")
-
-            FirebaseDatabase.getInstance().getReference("users/$chatPartnerId")
-                .addListenerForSingleValueEvent( object: ValueEventListener {
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        Log.d("listenForLatestMessages", "users")
-                        val userObject = snapshot.getValue(User::class.java)!!
-                        viewBinding.usernameTextviewLatestMessager.text = userObject.username
-
-                        val targetImageView = viewBinding.imageviewLatestMessager
-                        Picasso.get().load(userObject.profileImageUri).into(targetImageView)
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-
-                })
-
-        }
-
-        override fun getLayout(): Int {
-            return R.layout.latest_message_row
-        }
-    }
 
     private fun refreshRecyclerViewMessages() {
         adapter.clear()

@@ -38,19 +38,14 @@ class ChatLogActivity : AppCompatActivity() {
         supportActionBar?.title = toUser?.username
 
 //        setupDummyData()
-        try {
-            listenForMessages()
-            recyclerview_chat_log.adapter = adapter
-            recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
+        listenForMessages()
+        recyclerview_chat_log.adapter = adapter
 
-            send_button_chat_log.setOnClickListener {
-                Log.d("value", "attempt to send message...")
-                performSendMessage()
-            }
-
-        } catch (e: Exception) {
-            Log.d("value", "error -> ${e.printStackTrace()}")
+        send_button_chat_log.setOnClickListener {
+            Log.d("value", "attempt to send message...")
+            performSendMessage()
         }
+
 
     }
 
@@ -78,6 +73,9 @@ class ChatLogActivity : AppCompatActivity() {
                         adapter.add(ChatToItem(chatMessage.text, toUser!!))
                     }
                 }
+
+                recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
+
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
