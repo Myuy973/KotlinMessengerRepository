@@ -38,13 +38,18 @@ class ChatLogActivity : AppCompatActivity() {
         supportActionBar?.title = toUser?.username
 
 //        setupDummyData()
-        listenForMessages()
-        recyclerview_chat_log.adapter = adapter
-        recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
+        try {
+            listenForMessages()
+            recyclerview_chat_log.adapter = adapter
+            recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
 
-        send_button_chat_log.setOnClickListener {
-            Log.d("value", "attempt to send message...")
-            performSendMessage()
+            send_button_chat_log.setOnClickListener {
+                Log.d("value", "attempt to send message...")
+                performSendMessage()
+            }
+
+        } catch (e: Exception) {
+            Log.d("value", "error -> ${e.printStackTrace()}")
         }
 
     }
@@ -58,8 +63,10 @@ class ChatLogActivity : AppCompatActivity() {
         ref.addChildEventListener( object: ChildEventListener {
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+
                 Log.d("value", "add start")
                 Log.d("value", "adapter: ${adapter.itemCount}")
+                Log.d("value", "snapshot: ${snapshot.getValue()}")
                 val chatMessage = snapshot.getValue(ChatMessage::class.java)
 
                 if (chatMessage != null) {
@@ -91,16 +98,16 @@ class ChatLogActivity : AppCompatActivity() {
         val fromId = FirebaseAuth.getInstance().uid!!
         val toId = toUser?.uid!!
 
-        val reference = FirebaseDatabase.getInstance().getReference("user-messages/$fromId/$toId")
-        val toReference = FirebaseDatabase.getInstance().getReference("user-messages/$toId/$fromId")
+        val reference = FirebaseDatabase.getInstance().getReference("user-messages/$fromId/$toId").push()
+        val toReference = FirebaseDatabase.getInstance().getReference("user-messages/$toId/$fromId").push()
 
         // クラスにして送らないと送信できない(Activityも落ちる)
         val chatMessage = ChatMessage(reference.key!!, text, fromId, toId, System.currentTimeMillis() / 1000)
         reference.setValue(chatMessage)
             .addOnSuccessListener {
-                Log.d("value", "Saved our chat message to From: ${it}")
-                Log.d("value", "adapter.itemcount: ${adapter.itemCount}")
-                Log.d("value", "adapter.itemcount - 1: ${adapter.itemCount - 1}")
+//                Log.d("value", "Saved our chat message to From: ${it}")
+//                Log.d("value", "adapter.itemcount: ${adapter.itemCount}")
+//                Log.d("value", "adapter.itemcount - 1: ${adapte r.itemCount - 1}")
                 edittext_chat_log.text.clear()
                 recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
             }

@@ -44,7 +44,7 @@ class NewMessageActivity : AppCompatActivity() {
                 snapshot.children.forEach {
                     Log.d("value", it.toString())
                     val user = it.getValue(User::class.java)
-                    if (user != null) {
+                    if (user != null && user.uid != LatestMessagesActivity.currentUser.uid) {
                         adapter.add(UserItem(user))
                     }
                 }

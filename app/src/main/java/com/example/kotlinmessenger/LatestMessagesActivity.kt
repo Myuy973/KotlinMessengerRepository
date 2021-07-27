@@ -96,42 +96,39 @@ class LatestMessagesActivity : AppCompatActivity() {
     }
 
     private  fun listenForLatestMessages() {
-        try {
-            val fromId = FirebaseAuth.getInstance().uid!!
-            val ref = FirebaseDatabase.getInstance().getReference("latest-messages/$fromId")
-            ref.addChildEventListener(object: ChildEventListener {
 
-                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
+        val fromId = FirebaseAuth.getInstance().uid!!
+        val ref = FirebaseDatabase.getInstance().getReference("latest-messages/$fromId")
+        ref.addChildEventListener(object: ChildEventListener {
 
-                    Log.d("listenForLatestMessages", "database add changed!!! : ${chatMessage.text}")
-                    Log.d("listenForLatestMessages", "snapshot changed!!! : ${snapshot}")
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
 
-                    latestMessageMap[snapshot.key!!] = chatMessage
+                Log.d("listenForLatestMessages", "database add changed!!! : ${chatMessage.text}")
+                Log.d("listenForLatestMessages", "snapshot changed!!! : ${snapshot}")
 
-                    Log.d("listenForLatestMessages", "latestMessageMap: ${latestMessageMap[snapshot.key]}, id: ${snapshot.key}")
+                latestMessageMap[snapshot.key!!] = chatMessage
 
-                    refreshRecyclerViewMessages()
-                }
+                Log.d("listenForLatestMessages", "latestMessageMap: ${latestMessageMap[snapshot.key]}, id: ${snapshot.key}")
 
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
+                refreshRecyclerViewMessages()
+            }
 
-                    Log.d("listenForLatestMessages", "database onChildChanged!!!: ${chatMessage.text}")
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
 
-                    latestMessageMap[snapshot.key!!] = chatMessage
-                    refreshRecyclerViewMessages()
-                }
+                Log.d("listenForLatestMessages", "database onChildChanged!!!: ${chatMessage.text}")
 
-                override fun onChildRemoved(snapshot: DataSnapshot) {}
+                latestMessageMap[snapshot.key!!] = chatMessage
+                refreshRecyclerViewMessages()
+            }
 
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
 
-                override fun onCancelled(error: DatabaseError) {}
-            })
-        } catch (e: Exception) {
-            Log.d("listenForLatestMessages", "error: $e")
-        }
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
 
