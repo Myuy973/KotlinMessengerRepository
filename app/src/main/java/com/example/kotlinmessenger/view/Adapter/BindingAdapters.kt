@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.view
+package com.example.kotlinmessenger.view.Adapter
 
 import android.graphics.Bitmap
 import android.view.View

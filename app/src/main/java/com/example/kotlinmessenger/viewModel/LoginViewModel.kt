@@ -1,15 +1,12 @@
 package com.example.kotlinmessenger.viewModel
 
 import android.app.Activity
-import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.*
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.model.User
@@ -27,9 +24,6 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.selects.select
-import okhttp3.internal.Util
-import java.lang.Exception
 import java.util.*
 
 class LoginViewModel: ViewModel() {
@@ -50,8 +44,6 @@ class LoginViewModel: ViewModel() {
     lateinit var googleSignInClient: GoogleSignInClient
     private var auth: FirebaseAuth
 
-//    var startActivityForResultStart = MutableLiveData<Boolean>(false)
-//    lateinit var startActivityForResultFunction: (Intent?, Activity) -> Unit
     var requestCode: Int = 0
     lateinit var startActivityForResultIntent: Intent
 
@@ -59,13 +51,10 @@ class LoginViewModel: ViewModel() {
     private var selectedPhotoUri: Uri? = null
     var bitmap = MutableLiveData<Bitmap?>(null)
 
-    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+    val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("693890654310-4h5vpi1psul17adjt04cmqdsit9tpb8g.apps.googleusercontent.com")
             .requestEmail()
             .build()
-
-
-
 
 
     init {
@@ -155,7 +144,6 @@ class LoginViewModel: ViewModel() {
         startActivityForResultIntent.type = "image/*"
         requestCode = IMAGE_INPUT
         activity.startActivityForResult(startActivityForResultIntent, requestCode)
-    //        startActivityForResultFunction = imageSetFunction
     }
 
 

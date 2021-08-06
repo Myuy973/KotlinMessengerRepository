@@ -51,44 +51,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
 
-    private fun performLogin() {
-        val email = binding.emailEdittextLogin.text.toString()
-        val pass = binding.passwordEdittextLogin.text.toString()
-
-        if (email.isEmpty() || pass.isEmpty()) {
-            Toast.makeText(this, "Please enter text in text/ps", Toast.LENGTH_LONG)
-                .show()
-            return
-        }
-
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
-            .addOnCompleteListener {
-                val intent = Intent(this, LatestMessagesActivity::class.java)
-                // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(intent)
-
-                Toast.makeText(this, "Successfully Login", Toast.LENGTH_LONG)
-                    .show()
-            }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         viewModel.googleSigninFunction(data, this)
-
-//        if (requestCode == RegisterActivity.RC_SIGN_IN) {
-//            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-//            try {
-//                val account = task.getResult(ApiException::class.java)!!
-////                RegisterActivity().firebaseAuthWithGoogle(account.idToken!!)
-//            } catch (e: Exception) {
-//                Toast.makeText(this, "onActivityResult error: ${e.printStackTrace()}", Toast.LENGTH_SHORT).show()
-//                Log.d("value", "onActivityResult error: ${e.message}")
-//            }
-//
-//        }
     }
 
 
