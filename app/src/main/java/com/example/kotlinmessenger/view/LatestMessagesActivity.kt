@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.view
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,20 +8,21 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
-import com.example.kotlinmessenger.NewMessageActivity.Companion.USER_KEY
+import com.example.kotlinmessenger.R
+import com.example.kotlinmessenger.view.NewMessageActivity.Companion.USER_KEY
 import com.example.kotlinmessenger.databinding.ActivityLatestMessagesBinding
-import com.example.kotlinmessenger.databinding.LatestMessageRowBinding
+import com.example.kotlinmessenger.model.ChatMessage
+import com.example.kotlinmessenger.model.LatestMessageRow
+import com.example.kotlinmessenger.model.User
+import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.auth.api.Auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieAdapter
-import com.xwray.groupie.Item
-import com.xwray.groupie.databinding.BindableItem
 import kotlinx.android.synthetic.main.activity_latest_messages.*
+import java.util.Calendar.getInstance
 
 class LatestMessagesActivity : AppCompatActivity() {
 
@@ -49,11 +50,12 @@ class LatestMessagesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+        verifyUserIsLoggedIn()
+
         listenForLatestMessages()
 
         fetchCurrentUser()
-
-        verifyUserIsLoggedIn()
     }
 
 
@@ -138,10 +140,13 @@ class LatestMessagesActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             R.id.menu_sign_out -> {
-                FirebaseAuth.getInstance().signOut()
-                val intent = Intent(this, RegisterActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
+                AuthUI.getInstance().signOut(this).addOnSuccessListener {
+                    val intent = Intent(this, RegisterActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                }.addOnFailureListener {
+                    Log.d("value", "error: ${it.printStackTrace()}")
+                }
             }
         }
 

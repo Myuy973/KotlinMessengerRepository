@@ -1,18 +1,20 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.databinding.DataBindingUtil
+import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityChatLogBinding
 import com.example.kotlinmessenger.databinding.ChatFromRowBinding
 import com.example.kotlinmessenger.databinding.ChatToRowBinding
+import com.example.kotlinmessenger.model.ChatMessage
+import com.example.kotlinmessenger.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.databinding.BindableItem
@@ -34,7 +36,6 @@ class ChatLogActivity : AppCompatActivity() {
 
         toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
 //        val username = intent.getStringExtra(NewMessageActivity.USER_KEY)
-
         supportActionBar?.title = toUser?.username
 
 //        setupDummyData()

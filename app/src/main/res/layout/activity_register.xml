@@ -4,11 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="loginviewModel"
+            type="com.example.kotlinmessenger.viewModel.LoginViewModel"/>
+
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/holo_green_light"
-        tools:context=".RegisterActivity">
+        tools:context=".view.RegisterActivity">
 
         <EditText
             android:id="@+id/username_edittext_register"
@@ -22,6 +30,7 @@
             android:hint="UserName"
             android:inputType="textPersonName"
             android:paddingLeft="16dp"
+            android:text="@={loginviewModel.userName}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +46,7 @@
             android:hint="Password"
             android:inputType="textPassword"
             android:paddingLeft="16dp"
+            android:text="@={loginviewModel.userPassword}"
             app:layout_constraintEnd_toEndOf="@+id/email_edittext_register"
             app:layout_constraintStart_toStartOf="@+id/email_edittext_register"
             app:layout_constraintTop_toBottomOf="@+id/email_edittext_register" />
@@ -51,6 +61,7 @@
             android:hint="Email"
             android:inputType="textEmailAddress"
             android:paddingLeft="16dp"
+            android:text="@={loginviewModel.userEmail}"
             app:layout_constraintEnd_toEndOf="@+id/username_edittext_register"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/username_edittext_register"
@@ -61,8 +72,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text="register"
             android:background="@drawable/rounded_button"
+            android:enabled="@{loginviewModel.signinButtonType}"
+            android:text="register"
             app:backgroundTint="#669900"
             app:layout_constraintEnd_toEndOf="@+id/password_edittext_register"
             app:layout_constraintHorizontal_bias="0.5"
@@ -86,9 +98,10 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_photo_select_button"
             android:text="select photo"
             android:textSize="14sp"
-            android:background="@drawable/rounded_photo_select_button"
+            android:alpha="@{loginviewModel.buttonAlpha}"
             app:backgroundTint="#669900"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -97,13 +110,36 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/selectphoto_imageview_register"
-            app:civ_border_width="4dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
+            app:bitmap="@{loginviewModel.bitmap}"
+            app:civ_border_width="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/selectphoto_button_register"
             app:layout_constraintEnd_toEndOf="@+id/selectphoto_button_register"
             app:layout_constraintStart_toStartOf="@+id/selectphoto_button_register"
             app:layout_constraintTop_toTopOf="@+id/selectphoto_button_register" />
+
+        <ImageView
+            android:id="@+id/google_signin_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toStartOf="@+id/twitter_signin_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/already_have_an_account_textView"
+            app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+
+        <ImageView
+            android:id="@+id/twitter_signin_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="@+id/google_signin_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/google_signin_button"
+            app:layout_constraintTop_toTopOf="@+id/google_signin_button"
+            app:srcCompat="@drawable/ic_launcher_background" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

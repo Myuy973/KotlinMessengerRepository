@@ -12,24 +12,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KotlinMessenger">
-        <activity android:name=".LatestMessagesActivity">
+        <activity android:name=".view.LatestMessagesActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".NewMessageActivity">
+        <activity android:name=".view.RegisterActivity" />
+        <activity android:name=".view.LoginActivity" />
+        <activity android:name=".view.NewMessageActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LatestMessagesActivity" />
+                android:value=".view.LatestMessagesActivity" />
         </activity>
-        <activity android:name=".ChatLogActivity">
+        <activity android:name=".view.ChatLogActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LatestMessagesActivity" />
+                android:value=".view.LatestMessagesActivity" />
         </activity>
     </application>
 

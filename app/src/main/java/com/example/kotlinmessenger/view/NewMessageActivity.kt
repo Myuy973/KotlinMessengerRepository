@@ -1,12 +1,14 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.view
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityNewMessageBinding
 import com.example.kotlinmessenger.databinding.UserRowNewMessageBinding
+import com.example.kotlinmessenger.model.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase

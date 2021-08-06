@@ -3,10 +3,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="loginViewModel"
+            type="com.example.kotlinmessenger.viewModel.LoginViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/holo_green_light">
+
+        <ImageView
+            android:id="@+id/google_login_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="40dp"
+            app:layout_constraintEnd_toStartOf="@+id/twitter_login_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/back_to_register_textView"
+            app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+
+        <ImageView
+            android:id="@+id/twitter_login_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="@+id/google_login_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/google_login_button"
+            app:layout_constraintTop_toTopOf="@+id/google_login_button"
+            app:srcCompat="@drawable/ic_launcher_background" />
 
         <EditText
             android:id="@+id/email_edittext_login"
@@ -20,6 +48,7 @@
             android:hint="Email"
             android:inputType="textEmailAddress"
             android:paddingLeft="16dp"
+            android:text="@={loginViewModel.loginUserEmail}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,6 +64,7 @@
             android:hint="Password"
             android:inputType="textPassword"
             android:paddingLeft="16dp"
+            android:text="@={loginViewModel.loginUserPass}"
             app:layout_constraintEnd_toEndOf="@+id/email_edittext_login"
             app:layout_constraintStart_toStartOf="@+id/email_edittext_login"
             app:layout_constraintTop_toBottomOf="@+id/email_edittext_login" />
@@ -44,8 +74,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Login"
             android:background="@drawable/rounded_button"
+            android:text="Login"
+            android:enabled="@{loginViewModel.loginButtonType}"
             app:backgroundTint="#669900"
             app:layout_constraintEnd_toEndOf="@+id/password_edittext_login"
             app:layout_constraintStart_toStartOf="@+id/password_edittext_login"

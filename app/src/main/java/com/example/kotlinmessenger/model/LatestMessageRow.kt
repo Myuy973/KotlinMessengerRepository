@@ -1,6 +1,7 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.model
 
 import android.util.Log
+import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.LatestMessageRowBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -17,9 +18,6 @@ class LatestMessageRow(val chatMessage: ChatMessage): BindableItem<LatestMessage
         viewBinding.messageTextviewLatestMessager.text = chatMessage.text
 
         val chatPartnerId: String
-        Log.d("listenForLatestMessages", "text: ${chatMessage.text}")
-        Log.d("listenForLatestMessages", "fromid: ${chatMessage.fromId}")
-        Log.d("listenForLatestMessages", "loginuser: ${FirebaseAuth.getInstance().uid}")
         if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
             chatPartnerId = chatMessage.toId
         } else {
