@@ -15,8 +15,9 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/rounded_edittext_register_login"
             android:maxWidth="240dp"
-            android:padding="16dp"
+            android:padding="8dp"
             android:text="This is my message kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+            android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"
             app:layout_constraintTop_toTopOf="@+id/imageview_chat_to_row" />
 
@@ -30,6 +31,33 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@color/purple_500" />
+
+        <ImageView
+            android:id="@+id/send_image"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:scaleType="centerCrop"
+            android:maxHeight="500dp"
+            app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <!--        <EditText-->
+<!--            android:id="@+id/textView"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:ems="10"-->
+<!--            android:gravity="start|top"-->
+<!--            android:inputType="textMultiLine"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:background="@drawable/rounded_edittext_register_login"-->
+<!--            android:maxWidth="240dp"-->
+<!--            android:padding="16dp"-->
+<!--            android:text="This is my message kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/imageview_chat_to_row" />-->
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

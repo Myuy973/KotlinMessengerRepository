@@ -34,12 +34,6 @@ class RegisterActivity : AppCompatActivity() {
 
     private val viewModel : LoginViewModel by viewModels()
 
-    private lateinit var auth: FirebaseAuth
-
-    companion object {
-        lateinit var loginUser: User
-        val RC_SIGN_IN = 1
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

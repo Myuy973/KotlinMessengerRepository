@@ -3,12 +3,14 @@ package com.example.kotlinmessenger.view
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityNewMessageBinding
 import com.example.kotlinmessenger.databinding.UserRowNewMessageBinding
 import com.example.kotlinmessenger.model.User
+import com.example.kotlinmessenger.viewModel.UserPageViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -20,73 +22,18 @@ import kotlinx.android.synthetic.main.activity_new_message.*
 
 class NewMessageActivity : AppCompatActivity() {
 
+    private val viewModel: UserPageViewModel by viewModels()
     private lateinit var binding: ActivityNewMessageBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_new_message)
 
+        recyclerview_newmessage.adapter = viewModel.NewMessageAdapter.value
+
         supportActionBar?.title = "Select User"
 
-        fetchUsers()
+        viewModel.fetchUsers(this)
 
     }
-
-    //??????
-    companion object {
-        val USER_KEY = "USER_KEY"
-    }
-
-    private fun fetchUsers() {
-        val ref = FirebaseDatabase.getInstance().getReference("/users")
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val adapter = GroupieAdapter()
-                snapshot.children.forEach {
-                    Log.d("value", it.toString())
-                    val user = it.getValue(User::class.java)
-                    if (user != null && user.uid != LatestMessagesActivity.currentUser.uid) {
-                        adapter.add(UserItem(user))
-                    }
-                }
-                recyclerview_newmessage.adapter = adapter
-
-                adapter.setOnItemClickListener { item, view ->
-
-                    val userItem = item as UserItem
-                    Log.d("value", "item: $item")
-                    Log.d("value", "userItem: $userItem")
-                    Log.d("value", "user: ${userItem.user}")
-
-                    val intent = Intent(view.context, ChatLogActivity::class.java)
-                    intent.putExtra(USER_KEY, userItem.user)
-                    startActivity(intent)
-
-                    finish()
-                }
-
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
-    }
-
-}
-
-class UserItem(val user: User): BindableItem<UserRowNewMessageBinding>() {
-
-    override fun getLayout(): Int {
-        return R.layout.user_row_new_message
-    }
-
-    override fun bind(viewBinding: UserRowNewMessageBinding, position: Int) {
-        viewBinding.usernameTextviewNewMessage.text = user.username
-
-        Picasso.get().load(user.profileImageUri)
-            .into(viewBinding.imageView)
-
-    }
-
 }

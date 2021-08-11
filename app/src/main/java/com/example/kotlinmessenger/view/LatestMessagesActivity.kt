@@ -10,7 +10,6 @@ import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.view.NewMessageActivity.Companion.USER_KEY
 import com.example.kotlinmessenger.databinding.ActivityLatestMessagesBinding
 import com.example.kotlinmessenger.model.ChatMessage
 import com.example.kotlinmessenger.model.LatestMessageRow
@@ -33,22 +32,18 @@ class LatestMessagesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLatestMessagesBinding
 
 
-    companion object {
-        lateinit var currentUser: User
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_latest_messages)
 
-        recycler_latest_messages.adapter = viewModel.adapter.value
+        recycler_latest_messages.adapter = viewModel.LatestMessagesAdapter.value
         // カード間にボーダー
         recycler_latest_messages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
-        viewModel.adapter.value?.setOnItemClickListener { item, view ->
+        viewModel.LatestMessagesAdapter.value?.setOnItemClickListener { item, view ->
             val row = item as LatestMessageRow
             val intent = Intent(this, ChatLogActivity::class.java)
-            intent.putExtra(USER_KEY, row.chatPartnerUser)
+            intent.putExtra(viewModel.USER_KEY, row.chatPartnerUser)
             startActivity(intent)
         }
 

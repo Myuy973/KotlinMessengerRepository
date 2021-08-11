@@ -130,7 +130,6 @@ class LoginViewModel: ViewModel() {
         selectedPhotoUri = data?.data
         Log.d("value", "bitmap: ${bitmap.value ?: "null"}")
         bitmap.value = MediaStore.Images.Media.getBitmap(activity.contentResolver, selectedPhotoUri)
-        Log.d("value", "bitmap: ${bitmap.value}")
 
         buttonAlpha.value = 0f
 
@@ -139,7 +138,7 @@ class LoginViewModel: ViewModel() {
     }
 
     fun inputImage(activity: Activity) {
-        Log.d("value", "activity: ${activity.componentName.shortClassName.matches(Regex(""".*RegisterActivity"""))}")
+//        Log.d("value", "activity: ${activity.componentName.shortClassName.matches(Regex(""".*RegisterActivity"""))}")
         startActivityForResultIntent = Intent(Intent.ACTION_PICK)
         startActivityForResultIntent.type = "image/*"
         requestCode = IMAGE_INPUT

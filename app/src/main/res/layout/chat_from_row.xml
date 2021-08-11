@@ -15,8 +15,9 @@
             android:layout_marginStart="8dp"
             android:background="@drawable/rounded_edittext_register_login"
             android:maxWidth="240dp"
-            android:padding="16dp"
+            android:padding="8dp"
             android:text="This is my message kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+            android:textSize="12sp"
             app:layout_constraintStart_toEndOf="@+id/imageview_chat_from_row"
             app:layout_constraintTop_toTopOf="@+id/imageview_chat_from_row" />
 
@@ -31,6 +32,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@color/black" />
+
+        <ImageView
+            android:id="@+id/send_image"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:adjustViewBounds="true"
+            android:maxHeight="500dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toEndOf="@+id/imageview_chat_from_row"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <!--        <EditText-->
+<!--            android:id="@+id/textView"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:background="@drawable/rounded_edittext_register_login"-->
+<!--            android:ems="10"-->
+<!--            android:gravity="start|top"-->
+<!--            android:inputType="textMultiLine"-->
+<!--            android:maxWidth="240dp"-->
+<!--            android:padding="16dp"-->
+<!--            android:text="this"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/imageview_chat_from_row"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/imageview_chat_from_row" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
