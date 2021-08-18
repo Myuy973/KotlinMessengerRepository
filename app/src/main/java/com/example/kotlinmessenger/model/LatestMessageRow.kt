@@ -15,7 +15,7 @@ class LatestMessageRow(val chatMessage: ChatMessage): BindableItem<LatestMessage
     var chatPartnerUser: User? = null
 
     override fun bind(viewBinding: LatestMessageRowBinding, position: Int) {
-        viewBinding.messageTextviewLatestMessager.text = chatMessage.text
+        viewBinding.messageTextviewLatestMessager.text = if(chatMessage.text != "") chatMessage.text else "画像を送信しました"
 
         val chatPartnerId: String
         if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {

@@ -11,6 +11,7 @@ import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityNewMessageBinding
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
@@ -26,6 +27,7 @@ class NewMessageActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_new_message)
 
         recyclerview_newmessage.adapter = viewModel.NewMessageAdapter.value
+        recyclerview_newmessage.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
         supportActionBar?.title = "Select User"
 
