@@ -48,6 +48,9 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
+        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
+
+
     }
 
 

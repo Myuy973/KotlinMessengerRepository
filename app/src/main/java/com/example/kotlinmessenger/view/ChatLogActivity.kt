@@ -50,6 +50,9 @@ class ChatLogActivity : AppCompatActivity() {
         image_select_button.setOnClickListener {
             viewModel.imageSelecterStart(this)
         }
+
+        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

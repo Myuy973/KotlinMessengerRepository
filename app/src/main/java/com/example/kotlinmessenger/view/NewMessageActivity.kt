@@ -33,6 +33,7 @@ class NewMessageActivity : AppCompatActivity() {
 
         viewModel.fetchUserFriends(this)
 
+        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

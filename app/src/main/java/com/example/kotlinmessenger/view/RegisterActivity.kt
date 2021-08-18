@@ -50,6 +50,7 @@ class RegisterActivity : AppCompatActivity() {
             Log.d("value", "try  to show photo selector")
             viewModel.inputImage(this)
         }
+
         register_button_register.setOnClickListener {
             viewModel.performRegister(this)
         }
@@ -64,6 +65,10 @@ class RegisterActivity : AppCompatActivity() {
         twitter_signin_button.setOnClickListener {
             viewModel.twitterSignin(this)
         }
+
+        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
+
+
     }
 
 

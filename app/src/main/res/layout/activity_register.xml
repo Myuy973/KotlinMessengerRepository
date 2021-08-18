@@ -27,8 +27,9 @@
             android:layout_marginEnd="32dp"
             android:background="@drawable/rounded_edittext_register_login"
             android:ems="10"
-            android:hint="UserName"
+            android:hint="@string/name_edittext_hint"
             android:inputType="textPersonName"
+            android:maxLength="25"
             android:paddingLeft="16dp"
             android:text="@={loginviewModel.userName}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -37,28 +38,13 @@
             app:layout_constraintTop_toBottomOf="@+id/selectphoto_button_register" />
 
         <EditText
-            android:id="@+id/password_edittext_register"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/rounded_edittext_register_login"
-            android:ems="10"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:paddingLeft="16dp"
-            android:text="@={loginviewModel.userPassword}"
-            app:layout_constraintEnd_toEndOf="@+id/email_edittext_register"
-            app:layout_constraintStart_toStartOf="@+id/email_edittext_register"
-            app:layout_constraintTop_toBottomOf="@+id/email_edittext_register" />
-
-        <EditText
             android:id="@+id/email_edittext_register"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/rounded_edittext_register_login"
             android:ems="10"
-            android:hint="Email"
+            android:hint="@string/email_edittext_hint"
             android:inputType="textEmailAddress"
             android:paddingLeft="16dp"
             android:text="@={loginviewModel.userEmail}"
@@ -66,6 +52,22 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/username_edittext_register"
             app:layout_constraintTop_toBottomOf="@+id/username_edittext_register" />
+
+
+        <EditText
+            android:id="@+id/password_edittext_register"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/rounded_edittext_register_login"
+            android:ems="10"
+            android:hint="@string/pass_edittext_hint"
+            android:inputType="textPassword"
+            android:paddingLeft="16dp"
+            android:text="@={loginviewModel.userPassword}"
+            app:layout_constraintEnd_toEndOf="@+id/email_edittext_register"
+            app:layout_constraintStart_toStartOf="@+id/email_edittext_register"
+            app:layout_constraintTop_toBottomOf="@+id/email_edittext_register" />
 
         <Button
             android:id="@+id/register_button_register"

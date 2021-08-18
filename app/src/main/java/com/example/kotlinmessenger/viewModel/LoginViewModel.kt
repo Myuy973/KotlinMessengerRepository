@@ -1,10 +1,12 @@
 package com.example.kotlinmessenger.viewModel
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.Settings.Global.getString
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
@@ -34,15 +36,36 @@ class LoginViewModel: ViewModel() {
     val IMAGE_INPUT = 1
     val GOOGLE_SIGNIN = 2
 
+    // -------------------- email signin -----------------------------
+
     val userImage = MutableLiveData<Boolean>(false)
     val userName = MutableLiveData<String>("")
     val userEmail = MutableLiveData<String>("")
     val userPassword = MutableLiveData<String>("")
     val signinButtonType = MutableLiveData<Boolean>(false)
+    var signErrorMessage: MutableList<String> = mutableListOf()
 
     val loginUserEmail = MutableLiveData<String>("")
     val loginUserPass = MutableLiveData<String>("")
     val loginButtonType = MutableLiveData<Boolean>(false)
+    var loginErrorMessage: MutableList<String> = mutableListOf()
+
+    private val errorList = mapOf(
+            "nameEmpty" to "UserNameを入力してください",
+            "emailMissMatch" to "正しいメールアドレスと入力してください",
+            "passMissMatch" to "パスワードが英数字8文字以上ではありません",
+    )
+
+    private val errorMessageList = mapOf(
+            "passMissMatch" to "The password is invalid or the user does not have a password.",
+            "userNotFound" to "There is no user record corresponding to this identifier. The user may have been deleted.",
+            "passTooWrong" to "We have blocked all requests from this device due to unusual activity. Try again later. [ Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. ]",
+    )
+
+
+
+
+    // ------------------- google signin ----------------------------------------------
 
     lateinit var googleSignInClient: GoogleSignInClient
     private var auth: FirebaseAuth
@@ -60,14 +83,16 @@ class LoginViewModel: ViewModel() {
             .requestIdToken("693890654310-4h5vpi1psul17adjt04cmqdsit9tpb8g.apps.googleusercontent.com")
             .requestEmail()
             .build()
+    //-------------------------------------------------------
 
 
     init {
 
-        Log.d("value", "start Loginviewmodel")
+        Log.d("value", "start Login view model")
 
         auth = Firebase.auth
 
+        // それぞれ変更されたら全項目が入力済みかチェック
         listOf(userName, userEmail, userPassword).forEach { liveData ->
             liveData.asFlow()
                     .onEach { checkSigninItem() }
@@ -84,19 +109,60 @@ class LoginViewModel: ViewModel() {
 
     private fun checkSigninItem() {
 
+        if (!userName.value?.isEmpty()!!) {
+            signErrorMessage.remove(errorList["nameEmpty"])
+        } else if (!signErrorMessage.contains(errorList["nameEmpty"])) {
+            signErrorMessage.add(errorList["nameEmpty"]!!)
+        }
+
+        val emailPattern = Regex("""[a-zA-Z0-9._-]+@[a-z]+\.+[a-z]+""")
+        if (emailPattern.matches(userEmail.value.toString())) {
+            signErrorMessage.remove(errorList["emailMissMatch"])
+        } else if (!signErrorMessage.contains(errorList["emailMissMatch"])) {
+            signErrorMessage.add(errorList["emailMissMatch"]!!)
+        }
+
+
+        val passPattern = Regex("""^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,100}${'$'}""")
+        if (passPattern.matches(userPassword.value.toString())) {
+            signErrorMessage.remove(errorList["passMissMatch"])
+        } else if (!signErrorMessage.contains(errorList["passMissMatch"])) {
+            signErrorMessage.add(errorList["passMissMatch"]!!)
+        }
+
+        Log.d("value", "$signErrorMessage")
+
+
         Log.d("value", "start checkTextEmpty")
-//        Log.d("value", "image: ${userImage.value}, name: ${!userName.value?.isEmpty()!!}, email: ${!userEmail.value?.isEmpty()!!}, pass: ${!userPassword.value?.isEmpty()!!}")
-//        Log.d("value", "image: ${userImage.value}, name: ${userName.value}, email: ${userEmail.value}, pass: ${userPassword.value}")
         signinButtonType.value =
                 userImage.value!! &&
                 !userName.value?.isEmpty()!! &&
                 !userEmail.value?.isEmpty()!! &&
                 !userPassword.value?.isEmpty()!!
+        Log.d("value", "name: ${userName.value}, email: ${userEmail.value}, pass: ${userPassword.value}")
         Log.d("value", "signinButtonType: ${signinButtonType.value}")
 
     }
 
     private fun checkLoginItem() {
+
+        val emailPattern = Regex("""[a-zA-Z0-9._-]+@[a-z]+\.+[a-z]+""")
+        if (emailPattern.matches(loginUserEmail.value.toString())) {
+            loginErrorMessage.remove(errorList["emailMissMatch"])
+        } else if (!loginErrorMessage.contains(errorList["emailMissMatch"])) {
+            loginErrorMessage.add(errorList["emailMissMatch"]!!)
+        }
+
+
+        val passPattern = Regex("""^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,100}${'$'}""")
+        if (passPattern.matches(loginUserPass.value.toString())) {
+            loginErrorMessage.remove(errorList["passMissMatch"])
+        } else if (!loginErrorMessage.contains(errorList["passMissMatch"])) {
+            loginErrorMessage.add(errorList["passMissMatch"]!!)
+        }
+
+        Log.d("value", "$loginErrorMessage")
+
 
         loginButtonType.value =
                 !loginUserEmail.value?.isEmpty()!! &&
@@ -163,21 +229,30 @@ class LoginViewModel: ViewModel() {
         var email = ""
         var pass = ""
 
+
         when (shortActivityName) {
             ".view.RegisterActivity" -> {
                 email = userEmail.value!!
                 pass = userPassword.value!!
+                if (signErrorMessage.isNotEmpty()) {
+                    val error = signErrorMessage.joinToString(separator = "\n")
+                    toastPrint(error, activity)
+                    Log.d("value", error)
+                    return
+                }
             }
             ".view.LoginActivity" -> {
                 email = loginUserEmail.value!!
                 pass = loginUserPass.value!!
+                if (loginErrorMessage.isNotEmpty()) {
+                    val error = loginErrorMessage.joinToString(separator = "\n")
+                    toastPrint(error, activity)
+                    Log.d("value", error)
+                    return
+                }
             }
         }
 
-        if (email.isEmpty() || pass.isEmpty()) {
-            toastPrint("Please enter text in text/ps", activity)
-            return
-        }
 
         when (shortActivityName) {
             ".view.RegisterActivity" -> {
@@ -205,12 +280,14 @@ class LoginViewModel: ViewModel() {
                         toastPrint( "Successfully Login", activity)
                     }
                     .addOnFailureListener {
-                        Log.d("value",  "Failed to login: ${it.printStackTrace()}")
+                        Log.d("value",  "Failed to login: ${it.message}")
                         when (it.message!!) {
-                            R.string.login_email_or_pass_error.toString() -> {
+
+                            errorMessageList["passMissMatch"],
+                            errorMessageList["userNotFound"] -> {
                                 toastPrint("メールアドレスまたはパスワードが違います。", activity)
                             }
-                            R.string.login_failed_several_times.toString() -> {
+                            errorMessageList["passTooWrong"] -> {
                                 toastPrint("規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。", activity)
                             }
 
