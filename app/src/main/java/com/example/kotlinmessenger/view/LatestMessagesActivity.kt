@@ -51,6 +51,7 @@ class LatestMessagesActivity : AppCompatActivity() {
         viewModel.fetchCurrentUser()
         viewModel.listenForLatestMessages()
 
+//        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
         overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
 
 
