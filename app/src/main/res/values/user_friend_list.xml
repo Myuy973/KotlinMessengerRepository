@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="user_friend_list">
+        <item>user1</item>
+        <item>user2</item>
+        <item>user3</item>
+    </string-array>
+</resources>

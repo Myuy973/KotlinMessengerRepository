@@ -23,6 +23,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 import okhttp3.internal.Util
 import java.util.*
@@ -59,6 +60,9 @@ class RegisterActivity : AppCompatActivity() {
         }
         google_signin_button.setOnClickListener {
             viewModel.googleSignin(this)
+        }
+        twitter_signin_button.setOnClickListener {
+            viewModel.twitterSignin(this)
         }
     }
 

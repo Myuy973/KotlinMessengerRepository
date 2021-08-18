@@ -1,23 +1,19 @@
 package com.example.kotlinmessenger.view
 
-import android.content.Intent
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityNewMessageBinding
-import com.example.kotlinmessenger.databinding.UserRowNewMessageBinding
-import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.squareup.picasso.Picasso
-import com.xwray.groupie.GroupieAdapter
-import com.xwray.groupie.databinding.BindableItem
 import kotlinx.android.synthetic.main.activity_new_message.*
 
 class NewMessageActivity : AppCompatActivity() {
@@ -33,7 +29,62 @@ class NewMessageActivity : AppCompatActivity() {
 
         supportActionBar?.title = "Select User"
 
-        viewModel.fetchUsers(this)
+        viewModel.fetchUserFriends(this)
 
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.add_friend -> {
+
+                val dialog = AlertDialog.Builder(this)
+                val view = View.inflate(this, R.layout.dialog_input_friend_id, null)
+                dialog.setView(view)
+                    .setPositiveButton("追加") { dialog, which ->
+                        val inputUid = view.findViewById<EditText>(R.id.input_friend_user_id_text).text.toString()
+                        Log.d("value", "input: $inputUid")
+                        viewModel.addFriendFunction(inputUid, this)
+                    }
+                    .setNegativeButton("キャンセル", null)
+                    .show()
+
+
+            }
+            R.id.delete_friend -> {
+                val friendNameList: Array<String> = viewModel.friendList.map {
+                    it.userName
+                }.toTypedArray()
+                val deleteFriendNumber = mutableListOf<Int>()
+
+
+                val dialog = AlertDialog.Builder(this)
+                dialog.setTitle("削除するユーザーを選んでください")
+                    .setMultiChoiceItems(friendNameList, null) { dialog, which, isChecked ->
+                        if (isChecked) {
+                            Log.d("value", "$which selected")
+                            Log.d("value", "list: $deleteFriendNumber")
+                            deleteFriendNumber += which
+                        } else if (deleteFriendNumber.contains(which)) {
+                            deleteFriendNumber.remove(which)
+                        }
+                    }
+                    .setPositiveButton("削除") { dialog, which ->
+                        Log.d("value", "delete function: $deleteFriendNumber")
+                        viewModel.deleteFriendFunction(deleteFriendNumber, this)
+                    }
+                    .setNeutralButton("キャンセル", null)
+                    .show()
+
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.nav_new_message, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
 }

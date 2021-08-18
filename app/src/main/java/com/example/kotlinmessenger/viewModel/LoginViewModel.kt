@@ -15,8 +15,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -50,6 +53,8 @@ class LoginViewModel: ViewModel() {
     var buttonAlpha = MutableLiveData<Float>(1f)
     private var selectedPhotoUri: Uri? = null
     var bitmap = MutableLiveData<Bitmap?>(null)
+
+    private val provider: OAuthProvider.Builder = OAuthProvider.newBuilder("twitter.com")
 
     val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("693890654310-4h5vpi1psul17adjt04cmqdsit9tpb8g.apps.googleusercontent.com")
@@ -107,11 +112,15 @@ class LoginViewModel: ViewModel() {
 
     // ----------------- common Signin Function -------------------------------------------
 
-    fun saveUserToFirebaseDatabase(activity: Activity, profileImageUri: String, username: String) {
+    private fun saveUserToFirebaseDatabase(activity: Activity,
+                                           profileImageUri: String,
+                                           userName: String,
+                                           userEmail: String) {
+
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = Firebase.database.getReference("users/$uid")
 
-        val user = User(uid, username, profileImageUri)
+        val user = User(uid, userName, userEmail,  profileImageUri)
 
         ref.setValue(user).addOnSuccessListener {
             Log.d("value", "Finally we saved the user to Firebase Database")
@@ -177,7 +186,7 @@ class LoginViewModel: ViewModel() {
                     .addOnCompleteListener {
                         if (!it.isSuccessful) return@addOnCompleteListener
                         toastPrint("Login Successfully", activity)
-                        uploadImageToFirebaseStorage(activity)
+                        uploadImageToFirebaseStorage(activity, email)
                     }
                 .addOnFailureListener {
                     toastPrint("Failed to create user: ${it.message}", activity)
@@ -214,7 +223,7 @@ class LoginViewModel: ViewModel() {
 
     }
 
-    private fun uploadImageToFirebaseStorage(activity: Activity) {
+    private fun uploadImageToFirebaseStorage(activity: Activity, userEmail: String) {
         if (selectedPhotoUri == null) return
 
         Log.d("value", "uploadImageToFirebaseStorage start")
@@ -225,7 +234,7 @@ class LoginViewModel: ViewModel() {
             .addOnSuccessListener {
                 Log.d("value", "successfully uploaded image")
                 ref.downloadUrl.addOnSuccessListener {
-                    saveUserToFirebaseDatabase(activity, it.toString(), userName.value!!)
+                    saveUserToFirebaseDatabase(activity, it.toString(), userName.value!!, userEmail)
                 }
             }
             .addOnFailureListener { e ->
@@ -268,12 +277,31 @@ class LoginViewModel: ViewModel() {
                         val email = auth.currentUser?.email
                         val photourl = auth.currentUser?.photoUrl
                         Log.d("value", "google signin success : name: $name, email: $email, photourl: $photourl")
-                        saveUserToFirebaseDatabase(activity, photourl!!.toString(), name!!)
+                        saveUserToFirebaseDatabase(activity, photourl!!.toString(), name!!, email!!)
                     } else {
                         toastPrint("firebaseAuthWithGoogle error: ${task.exception}", activity)
                         Log.d("value", "firebaseAuthWithGoogle error: ${task.exception}")
                     }
                 }
     }
+
+    // --------------------------- twitter login --------------------------------------------------------
+
+
+    fun twitterSignin(activity: Activity) {
+        FirebaseAuth.getInstance().startActivityForSignInWithProvider(activity, provider.build())
+            .addOnSuccessListener {
+                Log.d("value", "name: ${it.user?.displayName}, email: ${it.user?.email}, id: ${it.user?.providerId}, image_url: ${it.user?.photoUrl}")
+                val userName = it.user?.displayName!!
+                val userEmail = it.user?.email ?: ""
+                val userPhotoUri = it.user?.photoUrl.toString()
+                saveUserToFirebaseDatabase(activity, userPhotoUri, userName, userEmail)
+                toastPrint("ログイン完了", activity)
+            }
+            .addOnFailureListener {
+                toastPrint("ログイン失敗: ${it.printStackTrace()}", activity)
+            }
+    }
+
 
 }

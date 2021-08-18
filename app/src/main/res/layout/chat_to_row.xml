@@ -15,9 +15,9 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/rounded_edittext_register_login"
             android:maxWidth="240dp"
-            android:padding="8dp"
+            android:padding="12dp"
             android:text="This is my message kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
-            android:textSize="12sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"
             app:layout_constraintTop_toTopOf="@+id/imageview_chat_to_row" />
 

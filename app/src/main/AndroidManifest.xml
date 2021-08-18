@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KotlinMessenger"
         android:usesCleartextTraffic="true">
+        <activity android:name=".view.ShowProfileActivity" />
         <activity android:name=".view.LatestMessagesActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -26,14 +26,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".view.LatestMessagesActivity" />
         </activity>
-        <activity android:name=".view.ChatLogActivity">
+        <activity android:name=".view.ChatLogActivity"
+            android:theme="@style/ChatCustomBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".view.LatestMessagesActivity" />
         </activity>
-        <activity android:name=".view.ShowActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
-
+        <activity
+            android:name=".view.ShowActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 </manifest>

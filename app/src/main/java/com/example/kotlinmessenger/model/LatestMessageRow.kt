@@ -32,7 +32,7 @@ class LatestMessageRow(val chatMessage: ChatMessage): BindableItem<LatestMessage
                 override fun onDataChange(snapshot: DataSnapshot) {
                     Log.d("listenForLatestMessages", "users")
                     chatPartnerUser = snapshot.getValue(User::class.java)!!
-                    viewBinding.usernameTextviewLatestMessager.text = chatPartnerUser?.username
+                    viewBinding.usernameTextviewLatestMessager.text = chatPartnerUser?.userName
 
                     val targetImageView = viewBinding.imageviewLatestMessager
                     Picasso.get().load(chatPartnerUser?.profileImageUri).into(targetImageView)

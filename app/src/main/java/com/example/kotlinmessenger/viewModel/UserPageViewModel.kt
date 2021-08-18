@@ -20,6 +20,7 @@ import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.model.UserItem
 import com.example.kotlinmessenger.view.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
@@ -43,6 +44,7 @@ class UserPageViewModel: ViewModel() {
     private var selectedImageUri: Uri? = null
     private val latestMessageMap = HashMap<String, ChatMessage>()
     var toUser: User? = User()
+    var friendList = arrayOf<User>()
 
     companion object {
         lateinit var currentUser: User
@@ -52,7 +54,7 @@ class UserPageViewModel: ViewModel() {
 
     // --------------------- common Function -------------------------------------------------
 
-    private fun printToast(text: String, activity: Activity) {
+    fun printToast(text: String, activity: Activity) {
         Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
     }
 
@@ -79,7 +81,7 @@ class UserPageViewModel: ViewModel() {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         try {
                             currentUser = snapshot.getValue(User::class.java)!!
-                            Log.d("value", "Login user: ${currentUser.username}")
+                            Log.d("value", "Login user: ${currentUser.userName}")
                         } catch (e: Exception) {
                             Log.d("value", "login user error: $e")
                         }
@@ -135,20 +137,23 @@ class UserPageViewModel: ViewModel() {
 
     // ------------------------------ NewMessageActivity ------------------------------------------------
 
-    fun fetchUsers(activity: Activity) {
-        val ref = FirebaseDatabase.getInstance().getReference("/users")
+    fun fetchUserFriends(activity: Activity) {
+        friendList = arrayOf()
+        val ref = FirebaseDatabase.getInstance().getReference("/user-friends/${currentUser.uid}")
         ref.addListenerForSingleValueEvent(object: ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 NewMessageAdapter.value?.clear()
                 snapshot.children.forEach {
-                    Log.d("value", "currentuser: ${currentUser.uid}")
-                    Log.d("value", "user: ${it.getValue(User::class.java)?.username}")
+//                    Log.d("value", "current user: ${currentUser.uid}")
+//                    Log.d("value", "user: ${it.getValue(User::class.java)?.userName}")
                     val user = it.getValue(User::class.java)
                     Log.d("value", "${user?.uid != currentUser.uid}, ${user?.uid}, ${currentUser.uid}")
                     if (user != null && user.uid != currentUser.uid) {
-                        Log.d("value", "UserItem add to adapter")
                         NewMessageAdapter.value?.add(UserItem(user))
+                        friendList += user
+                        Log.d("value", "add user: ${user.userName}")
+                        Log.d("value", "friendlist: ${friendList.map { it.userName }}")
                     }
                 }
 
@@ -169,6 +174,80 @@ class UserPageViewModel: ViewModel() {
             override fun onCancelled(error: DatabaseError) {
             }
         })
+    }
+
+    fun addFriendFunction(uid: String, activity: Activity) {
+        Log.d("value", "start addFriendFunction")
+
+        if (currentUser.uid == uid) {
+            printToast("自分を追加することはできません", activity)
+            return
+        } else if (uid.isEmpty()) {
+            printToast("ユーザーのIDを入力してください", activity)
+            return
+        }
+
+        val searchUserRef = FirebaseDatabase.getInstance().getReference("users/$uid")
+        searchUserRef.get()
+                .addOnSuccessListener {
+                    val friendData = it.getValue(User::class.java)
+
+                    val myFriendRef =
+                            FirebaseDatabase.getInstance().getReference("user-friends/${currentUser.uid}/${friendData?.uid}")
+                    val yourFriendRef =
+                            FirebaseDatabase.getInstance().getReference("user-friends/${friendData?.uid}/${currentUser.uid}")
+                    try {
+                        myFriendRef.setValue(friendData)
+                        yourFriendRef.setValue(currentUser)
+
+                        fetchUserFriends(activity)
+
+                        printToast("${it.getValue(User::class.java)?.userName}さんを追加しました！", activity)
+
+                    } catch (e: java.lang.Exception) {
+                        printToast("ユーザー追加に失敗しました", activity)
+                        Log.d("value", "add friend error: ${e.printStackTrace()}")
+                    }
+
+
+                }
+                .addOnFailureListener {
+                    printToast("ユーザーが見つかりません", activity)
+                }
+
+    }
+
+    fun deleteFriendFunction(deleteList: List<Int>, activity: Activity) {
+
+        if (deleteList.isEmpty()) {
+            printToast("削除するユーザーを選んでください", activity)
+            return
+        }
+
+        val deleteUserData = mutableListOf<User>()
+        deleteList.forEach { num ->
+            deleteUserData += friendList[num]
+        }
+
+        try {
+            deleteUserData.forEach { deleteUser ->
+                val removeMyFriendRef = FirebaseDatabase
+                    .getInstance()
+                    .getReference("user-friends/${currentUser.uid}/${deleteUser.uid}")
+                val removeYourFriendRef = FirebaseDatabase
+                    .getInstance()
+                    .getReference("user-friends/${deleteUser.uid}/${currentUser.uid}")
+                removeMyFriendRef.removeValue()
+                removeYourFriendRef.removeValue()
+            }
+            fetchUserFriends(activity)
+            printToast("削除に成功しました。", activity)
+        } catch (e: java.lang.Exception) {
+            printToast("削除に失敗しました。", activity)
+        }
+
+
+
     }
 
 

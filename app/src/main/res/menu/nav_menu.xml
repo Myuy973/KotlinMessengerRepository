@@ -4,15 +4,19 @@
 
     <item
         android:id="@+id/menu_new_message"
-        android:icon="@drawable/ic_image_icon"
+        android:icon="@drawable/ic_new_messge_icon"
         android:title="New Message"
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/user_profile"
+        android:title="User Profile"
+        app:showAsAction="never" />
+    <item
+
         android:id="@+id/menu_sign_out"
-        android:icon="@drawable/ic_logout"
         android:title="Sign Out"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
 
 </menu>

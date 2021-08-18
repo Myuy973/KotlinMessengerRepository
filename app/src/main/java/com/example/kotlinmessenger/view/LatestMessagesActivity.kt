@@ -47,7 +47,6 @@ class LatestMessagesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
         viewModel.verifyUserIsLoggedIn(this)
         viewModel.fetchCurrentUser()
         viewModel.listenForLatestMessages()
@@ -62,6 +61,10 @@ class LatestMessagesActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.menu_new_message -> {
                 val intent = Intent(this, NewMessageActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.user_profile -> {
+                val intent = Intent(this, ShowProfileActivity::class.java)
                 startActivity(intent)
             }
             R.id.menu_sign_out -> {

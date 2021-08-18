@@ -38,7 +38,7 @@ class ChatLogActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         toUser = intent.getParcelableExtra<User>(viewModel.USER_KEY)
-        supportActionBar?.title = toUser?.username
+        supportActionBar?.title = toUser?.userName
 
         viewModel.listenForMessages(toUser, this)
         recyclerview_chat_log.adapter = viewModel.ChatLogAdapter.value
