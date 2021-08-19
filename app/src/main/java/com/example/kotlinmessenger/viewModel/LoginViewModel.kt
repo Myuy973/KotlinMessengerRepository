@@ -191,6 +191,7 @@ class LoginViewModel: ViewModel() {
         ref.setValue(user).addOnSuccessListener {
             Log.d("value", "Finally we saved the user to Firebase Database")
             val intent = Intent(activity, LatestMessagesActivity::class.java)
+            intent.putExtra("fromActivity", "LoginActivity")
             // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             activity.startActivity(intent)
@@ -272,6 +273,7 @@ class LoginViewModel: ViewModel() {
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
                     .addOnSuccessListener {
                         val intent = Intent(activity, LatestMessagesActivity::class.java)
+                        intent.putExtra("fromActivity", "LoginActivity")
                         // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
                         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         activity.startActivity(intent)

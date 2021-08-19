@@ -47,12 +47,28 @@ class LatestMessagesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val fromActivity = intent.getStringExtra("fromActivity")
+
+        Log.d("value", "fromActivity: $fromActivity")
+
+        when(fromActivity) {
+            "LoginActivity" -> {
+                Log.d("value", "fromActivity: LoginActivity")
+                overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
+            }
+            else -> {
+                Log.d("value", "fromActivity: else")
+                overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
+            }
+        }
+
+//        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
+//        overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
+
         viewModel.verifyUserIsLoggedIn(this)
         viewModel.fetchCurrentUser()
         viewModel.listenForLatestMessages()
 
-//        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
-        overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
 
 
     }
@@ -90,5 +106,6 @@ class LatestMessagesActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.nav_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
+
 
 }
