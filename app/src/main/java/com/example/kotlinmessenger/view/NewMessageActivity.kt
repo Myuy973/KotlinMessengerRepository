@@ -46,7 +46,7 @@ class NewMessageActivity : AppCompatActivity() {
                 dialog.setView(view)
                     .setPositiveButton("追加") { dialog, which ->
                         val inputUid = view.findViewById<EditText>(R.id.input_friend_user_id_text).text.toString()
-                        Log.d("value", "input: $inputUid")
+                        Log.d("log", "input: $inputUid")
                         viewModel.addFriendFunction(inputUid, this)
                     }
                     .setNegativeButton("キャンセル", null)
@@ -65,15 +65,15 @@ class NewMessageActivity : AppCompatActivity() {
                 dialog.setTitle("削除するユーザーを選んでください")
                     .setMultiChoiceItems(friendNameList, null) { dialog, which, isChecked ->
                         if (isChecked) {
-                            Log.d("value", "$which selected")
-                            Log.d("value", "list: $deleteFriendNumber")
+                            Log.d("log", "$which selected")
+                            Log.d("log", "list: $deleteFriendNumber")
                             deleteFriendNumber += which
                         } else if (deleteFriendNumber.contains(which)) {
                             deleteFriendNumber.remove(which)
                         }
                     }
                     .setPositiveButton("削除") { dialog, which ->
-                        Log.d("value", "delete function: $deleteFriendNumber")
+                        Log.d("log", "delete function: $deleteFriendNumber")
                         viewModel.deleteFriendFunction(deleteFriendNumber, this)
                     }
                     .setNeutralButton("キャンセル", null)

@@ -47,7 +47,7 @@ class RegisterActivity : AppCompatActivity() {
 
 
         selectphoto_button_register.setOnClickListener {
-            Log.d("value", "try  to show photo selector")
+            Log.d("log", "try  to show photo selector")
             viewModel.inputImage(this)
         }
 
@@ -76,9 +76,9 @@ class RegisterActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-//        Log.d("value", "requestCode: $requestCode, resultCode: $resultCode, data: $data")
+//        Log.d("log", "requestCode: $requestCode, resultCode: $resultCode, data: $data")
         if (requestCode == viewModel.IMAGE_INPUT && resultCode == Activity.RESULT_OK && data != null) {
-            Log.d("value", "Photo was selected")
+            Log.d("log", "Photo was selected")
             
             viewModel.imageSetFunction(data, this)
 

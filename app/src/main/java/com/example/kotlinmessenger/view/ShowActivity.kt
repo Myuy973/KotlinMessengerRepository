@@ -22,7 +22,7 @@ class ShowActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_show)
 
         val imageUri = intent.getStringExtra(UserPageViewModel().IMAGE_SHOW) ?: ""
-        Log.d("value", "show Activity imageuri: $imageUri")
+        Log.d("log", "show Activity imageuri: $imageUri")
 
         ViewCompat.setTransitionName(binding.showImagePreview, VIEW_NAME_HEADER_IMAGE)
         Picasso.get().load(imageUri).into(binding.showImagePreview)

@@ -49,15 +49,15 @@ class LatestMessagesActivity : AppCompatActivity() {
 
         val fromActivity = intent.getStringExtra("fromActivity")
 
-        Log.d("value", "fromActivity: $fromActivity")
+        Log.d("log", "fromActivity: $fromActivity")
 
         when(fromActivity) {
             "LoginActivity" -> {
-                Log.d("value", "fromActivity: LoginActivity")
+                Log.d("log", "fromActivity: LoginActivity")
                 overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
             }
             else -> {
-                Log.d("value", "fromActivity: else")
+                Log.d("log", "fromActivity: else")
                 overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
             }
         }
@@ -93,7 +93,7 @@ class LatestMessagesActivity : AppCompatActivity() {
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }.addOnFailureListener {
-                    Log.d("value", "error: ${it.printStackTrace()}")
+                    Log.d("log", "error: ${it.printStackTrace()}")
                 }
             }
         }

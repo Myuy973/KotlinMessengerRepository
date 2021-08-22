@@ -88,7 +88,7 @@ class LoginViewModel: ViewModel() {
 
     init {
 
-        Log.d("value", "start Login view model")
+        Log.d("log", "start Login view model")
 
         auth = Firebase.auth
 
@@ -130,17 +130,17 @@ class LoginViewModel: ViewModel() {
             signErrorMessage.add(errorList["passMissMatch"]!!)
         }
 
-        Log.d("value", "$signErrorMessage")
+        Log.d("log", "$signErrorMessage")
 
 
-        Log.d("value", "start checkTextEmpty")
+        Log.d("log", "start checkTextEmpty")
         signinButtonType.value =
                 userImage.value!! &&
                 !userName.value?.isEmpty()!! &&
                 !userEmail.value?.isEmpty()!! &&
                 !userPassword.value?.isEmpty()!!
-        Log.d("value", "name: ${userName.value}, email: ${userEmail.value}, pass: ${userPassword.value}")
-        Log.d("value", "signinButtonType: ${signinButtonType.value}")
+        Log.d("log", "name: ${userName.value}, email: ${userEmail.value}, pass: ${userPassword.value}")
+        Log.d("log", "signinButtonType: ${signinButtonType.value}")
 
     }
 
@@ -161,7 +161,7 @@ class LoginViewModel: ViewModel() {
             loginErrorMessage.add(errorList["passMissMatch"]!!)
         }
 
-        Log.d("value", "$loginErrorMessage")
+        Log.d("log", "$loginErrorMessage")
 
 
         loginButtonType.value =
@@ -189,14 +189,14 @@ class LoginViewModel: ViewModel() {
         val user = User(uid, userName, userEmail,  profileImageUri)
 
         ref.setValue(user).addOnSuccessListener {
-            Log.d("value", "Finally we saved the user to Firebase Database")
+            Log.d("log", "Finally we saved the user to Firebase Database")
             val intent = Intent(activity, LatestMessagesActivity::class.java)
             intent.putExtra("fromActivity", "LoginActivity")
             // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             activity.startActivity(intent)
         }.addOnFailureListener {
-            Log.d("value", "save is not Success")
+            Log.d("log", "save is not Success")
         }
     }
 
@@ -204,7 +204,7 @@ class LoginViewModel: ViewModel() {
 
     fun imageSetFunction(data: Intent?, activity: Activity) {
         selectedPhotoUri = data?.data
-        Log.d("value", "bitmap: ${bitmap.value ?: "null"}")
+        Log.d("log", "bitmap: ${bitmap.value ?: "null"}")
         bitmap.value = MediaStore.Images.Media.getBitmap(activity.contentResolver, selectedPhotoUri)
 
         buttonAlpha.value = 0f
@@ -214,7 +214,7 @@ class LoginViewModel: ViewModel() {
     }
 
     fun inputImage(activity: Activity) {
-//        Log.d("value", "activity: ${activity.componentName.shortClassName.matches(Regex(""".*RegisterActivity"""))}")
+//        Log.d("log", "activity: ${activity.componentName.shortClassName.matches(Regex(""".*RegisterActivity"""))}")
         startActivityForResultIntent = Intent(Intent.ACTION_PICK)
         startActivityForResultIntent.type = "image/*"
         requestCode = IMAGE_INPUT
@@ -224,7 +224,7 @@ class LoginViewModel: ViewModel() {
 
     fun performRegister(activity: Activity) {
 
-        Log.d("value", "registerbutton push")
+        Log.d("log", "registerbutton push")
 
         val shortActivityName = activity.componentName.shortClassName
         var email = ""
@@ -238,7 +238,7 @@ class LoginViewModel: ViewModel() {
                 if (signErrorMessage.isNotEmpty()) {
                     val error = signErrorMessage.joinToString(separator = "\n")
                     toastPrint(error, activity)
-                    Log.d("value", error)
+                    Log.d("log", error)
                     return
                 }
             }
@@ -248,7 +248,7 @@ class LoginViewModel: ViewModel() {
                 if (loginErrorMessage.isNotEmpty()) {
                     val error = loginErrorMessage.joinToString(separator = "\n")
                     toastPrint(error, activity)
-                    Log.d("value", error)
+                    Log.d("log", error)
                     return
                 }
             }
@@ -257,7 +257,7 @@ class LoginViewModel: ViewModel() {
 
         when (shortActivityName) {
             ".view.RegisterActivity" -> {
-                Log.d("value",  "register activity")
+                Log.d("log",  "register activity")
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass)
                     .addOnCompleteListener {
                         if (!it.isSuccessful) return@addOnCompleteListener
@@ -269,7 +269,7 @@ class LoginViewModel: ViewModel() {
                 }
             }
             ".view.LoginActivity" -> {
-                Log.d("value",  "loginActivity")
+                Log.d("log",  "loginActivity")
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
                     .addOnSuccessListener {
                         val intent = Intent(activity, LatestMessagesActivity::class.java)
@@ -278,11 +278,11 @@ class LoginViewModel: ViewModel() {
                         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         activity.startActivity(intent)
 
-                        Log.d("value",  "Successfully Login")
+                        Log.d("log",  "Successfully Login")
                         toastPrint( "Successfully Login", activity)
                     }
                     .addOnFailureListener {
-                        Log.d("value",  "Failed to login: ${it.message}")
+                        Log.d("log",  "Failed to login: ${it.message}")
                         when (it.message!!) {
 
                             errorMessageList["passMissMatch"],
@@ -305,19 +305,19 @@ class LoginViewModel: ViewModel() {
     private fun uploadImageToFirebaseStorage(activity: Activity, userEmail: String) {
         if (selectedPhotoUri == null) return
 
-        Log.d("value", "uploadImageToFirebaseStorage start")
+        Log.d("log", "uploadImageToFirebaseStorage start")
         // 一意の文字列
         val filename = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
         ref.putFile(selectedPhotoUri!!)
             .addOnSuccessListener {
-                Log.d("value", "successfully uploaded image")
+                Log.d("log", "successfully uploaded image")
                 ref.downloadUrl.addOnSuccessListener {
                     saveUserToFirebaseDatabase(activity, it.toString(), userName.value!!, userEmail)
                 }
             }
             .addOnFailureListener { e ->
-                Log.d("value", "error: ${e.printStackTrace()}")
+                Log.d("log", "error: ${e.printStackTrace()}")
             }
     }
 
@@ -342,7 +342,7 @@ class LoginViewModel: ViewModel() {
             firebaseAuthWithGoogle(account.idToken!!, activity)
         } catch (e: Exception) {
             toastPrint("onActivityResult error: ${e.printStackTrace()}", activity)
-            Log.d("value", "onActivityResult error: ${e.message}")
+            Log.d("log", "onActivityResult error: ${e.message}")
         }
 
     }
@@ -355,11 +355,11 @@ class LoginViewModel: ViewModel() {
                         val name = auth.currentUser?.displayName
                         val email = auth.currentUser?.email
                         val photourl = auth.currentUser?.photoUrl
-                        Log.d("value", "google signin success : name: $name, email: $email, photourl: $photourl")
+                        Log.d("log", "google signin success : name: $name, email: $email, photourl: $photourl")
                         saveUserToFirebaseDatabase(activity, photourl!!.toString(), name!!, email!!)
                     } else {
                         toastPrint("firebaseAuthWithGoogle error: ${task.exception}", activity)
-                        Log.d("value", "firebaseAuthWithGoogle error: ${task.exception}")
+                        Log.d("log", "firebaseAuthWithGoogle error: ${task.exception}")
                     }
                 }
     }
@@ -370,7 +370,7 @@ class LoginViewModel: ViewModel() {
     fun twitterSignin(activity: Activity) {
         FirebaseAuth.getInstance().startActivityForSignInWithProvider(activity, provider.build())
             .addOnSuccessListener {
-                Log.d("value", "name: ${it.user?.displayName}, email: ${it.user?.email}, id: ${it.user?.providerId}, image_url: ${it.user?.photoUrl}")
+                Log.d("log", "name: ${it.user?.displayName}, email: ${it.user?.email}, id: ${it.user?.providerId}, image_url: ${it.user?.photoUrl}")
                 val userName = it.user?.displayName!!
                 val userEmail = it.user?.email ?: ""
                 val userPhotoUri = it.user?.photoUrl.toString()
@@ -378,7 +378,8 @@ class LoginViewModel: ViewModel() {
                 toastPrint("ログイン完了", activity)
             }
             .addOnFailureListener {
-                toastPrint("ログイン失敗: ${it.printStackTrace()}", activity)
+                toastPrint("ログイン失敗: ${it.message}", activity)
+                Log.d("log", "")
             }
     }
 

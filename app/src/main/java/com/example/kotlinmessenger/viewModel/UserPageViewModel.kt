@@ -81,9 +81,9 @@ class UserPageViewModel: ViewModel() {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         try {
                             currentUser = snapshot.getValue(User::class.java)!!
-                            Log.d("value", "Login user: ${currentUser.userName}")
+                            Log.d("log", "Login user: ${currentUser.userName}")
                         } catch (e: Exception) {
-                            Log.d("value", "login user error: $e")
+                            Log.d("log", "login user error: $e")
                         }
                     }
 
@@ -145,15 +145,15 @@ class UserPageViewModel: ViewModel() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 NewMessageAdapter.value?.clear()
                 snapshot.children.forEach {
-//                    Log.d("value", "current user: ${currentUser.uid}")
-//                    Log.d("value", "user: ${it.getValue(User::class.java)?.userName}")
+//                    Log.d("log", "current user: ${currentUser.uid}")
+//                    Log.d("log", "user: ${it.getValue(User::class.java)?.userName}")
                     val user = it.getValue(User::class.java)
-                    Log.d("value", "${user?.uid != currentUser.uid}, ${user?.uid}, ${currentUser.uid}")
+                    Log.d("log", "${user?.uid != currentUser.uid}, ${user?.uid}, ${currentUser.uid}")
                     if (user != null && user.uid != currentUser.uid) {
                         NewMessageAdapter.value?.add(UserItem(user))
                         friendList += user
-                        Log.d("value", "add user: ${user.userName}")
-                        Log.d("value", "friendlist: ${friendList.map { it.userName }}")
+                        Log.d("log", "add user: ${user.userName}")
+                        Log.d("log", "friendlist: ${friendList.map { it.userName }}")
                     }
                 }
 
@@ -177,7 +177,7 @@ class UserPageViewModel: ViewModel() {
     }
 
     fun addFriendFunction(uid: String, activity: Activity) {
-        Log.d("value", "start addFriendFunction")
+        Log.d("log", "start addFriendFunction")
 
         if (currentUser.uid == uid) {
             printToast("自分を追加することはできません", activity)
@@ -206,7 +206,7 @@ class UserPageViewModel: ViewModel() {
 
                     } catch (e: java.lang.Exception) {
                         printToast("ユーザー追加に失敗しました", activity)
-                        Log.d("value", "add friend error: ${e.printStackTrace()}")
+                        Log.d("log", "add friend error: ${e.printStackTrace()}")
                     }
 
 
@@ -264,13 +264,13 @@ class UserPageViewModel: ViewModel() {
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-                Log.d("value", "add start")
-                Log.d("value", "adapter: ${ChatLogAdapter.value?.itemCount}")
-                Log.d("value", "snapshot: ${snapshot.getValue()}")
+                Log.d("log", "add start")
+                Log.d("log", "adapter: ${ChatLogAdapter.value?.itemCount}")
+                Log.d("log", "snapshot: ${snapshot.getValue()}")
                 val chatMessage = snapshot.getValue(ChatMessage::class.java)
 
                 if (chatMessage != null) {
-                    Log.d("value", chatMessage.text)
+                    Log.d("log", chatMessage.text)
                     if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
                         val currentUser = currentUser
                         ChatLogAdapter.value?.add(ChatFromItem(chatMessage.imageUrl, chatMessage.text, currentUser, activity))
@@ -311,27 +311,27 @@ class UserPageViewModel: ViewModel() {
 
         val reference = FirebaseDatabase.getInstance().getReference("user-messages/$fromId/$toId").push()
         val toReference = FirebaseDatabase.getInstance().getReference("user-messages/$toId/$fromId").push()
-        Log.d("value", "parameter set ok")
+        Log.d("log", "parameter set ok")
 
-        Log.d("value", "${reference.key!!}, ${chatInputText.value!!}, ${fromId}, ${toId}, ${System.currentTimeMillis() / 1000}")
+        Log.d("log", "${reference.key!!}, ${chatInputText.value!!}, ${fromId}, ${toId}, ${System.currentTimeMillis() / 1000}")
         // クラスにして送らないと送信できない(Activityも落ちる)
         val chatMessage = ChatMessage(reference.key!!, chatInputText.value!!, imageUri, fromId, toId, System.currentTimeMillis() / 1000)
         reference.setValue(chatMessage)
                 .addOnSuccessListener {
-                Log.d("value", "Saved our chat message to From: ${it}")
-                Log.d("value", "inputText: ${chatInputText.value}")
+                Log.d("log", "Saved our chat message to From: ${it}")
+                Log.d("log", "inputText: ${chatInputText.value}")
                     chatInputText.value = ""
-                Log.d("value", "inputText: ${chatInputText.value}")
+                Log.d("log", "inputText: ${chatInputText.value}")
 //                    recyclerview_chat_log.scrollToPosition(ChatLogAdapter.value?.itemCount!! - 1)
                     try {
                         scrollPosition.value = ChatLogAdapter.value?.itemCount!! - 1
                     } catch (e: java.lang.Exception) {
-                        Log.d("value", "error: ${e.printStackTrace()}")
+                        Log.d("log", "error: ${e.printStackTrace()}")
                     }
                 }
         toReference.setValue(chatMessage)
                 .addOnSuccessListener {
-                    Log.d("value", "Saved our chat message to To: ${it}")
+                    Log.d("log", "Saved our chat message to To: ${it}")
                 }
 
 
@@ -359,7 +359,7 @@ class UserPageViewModel: ViewModel() {
         ref.putFile(selectedImageUri!!)
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {
-                        Log.d("value", "image uri: ${it.toString()}")
+                        Log.d("log", "image uri: ${it.toString()}")
                         performSendMessage(activity, it.toString())
                     }
                 }
@@ -370,7 +370,7 @@ class UserPageViewModel: ViewModel() {
     @SuppressWarnings("unchecked")
     fun changeToShowActivity(imageView: View, imageUri: String, activity: Activity) {
         val intent = Intent(activity, ShowActivity::class.java)
-        Log.d("value", "imageuri: $imageUri")
+        Log.d("log", "imageuri: $imageUri")
         intent.putExtra(IMAGE_SHOW, imageUri)
 
         val activityOptions: ActivityOptionsCompat =

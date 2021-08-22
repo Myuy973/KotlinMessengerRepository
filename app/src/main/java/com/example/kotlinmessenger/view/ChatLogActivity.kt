@@ -44,7 +44,7 @@ class ChatLogActivity : AppCompatActivity() {
         recyclerview_chat_log.adapter = viewModel.ChatLogAdapter.value
 
         send_button_chat_log.setOnClickListener {
-            Log.d("value", "attempt to send message...")
+            Log.d("log", "attempt to send message...")
             viewModel.performSendMessage(this)
         }
         image_select_button.setOnClickListener {
