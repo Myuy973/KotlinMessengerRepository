@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import com.example.kotlinmessenger.R
@@ -36,12 +37,14 @@ class ChatLogActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat_log)
         binding.userPageViewModel = viewModel
         binding.lifecycleOwner = this
+        Log.d("log", "ChatLog start")
 
         toUser = intent.getParcelableExtra<User>(viewModel.USER_KEY)
         supportActionBar?.title = toUser?.userName
 
         viewModel.listenForMessages(toUser, this)
         recyclerview_chat_log.adapter = viewModel.ChatLogAdapter.value
+
 
         send_button_chat_log.setOnClickListener {
             Log.d("log", "attempt to send message...")
@@ -52,8 +55,6 @@ class ChatLogActivity : AppCompatActivity() {
         }
 
         overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
-//        overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
-
 
     }
 
@@ -61,6 +62,27 @@ class ChatLogActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.imageSelectedFunction(data, this)
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            // ChatLogActivityから離れる際にaddChildEventListenerをデタッチする
+            android.R.id.home -> {
+                Log.d("log", "push backbutton in actionbar")
+                viewModel.eventlistenerFinish()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        Log.d("log", "end activity")
+        // ChatLogActivityから離れる際にaddChildEventListenerをデタッチする
+        viewModel.eventlistenerFinish()
+    }
+
 
 }
 

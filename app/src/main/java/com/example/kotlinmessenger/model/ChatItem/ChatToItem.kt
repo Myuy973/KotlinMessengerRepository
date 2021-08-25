@@ -27,6 +27,7 @@ class ChatToItem(val imageUri: String, val text: String, val user: User, activit
                 viewBinding.textView.visibility = View.GONE
             } else {
                 viewBinding.textView.text = text
+                viewBinding.textView.width = viewBinding.textView.maxWidth
                 viewBinding.textView.setBackgroundResource(R.drawable.image_description_text)
             }
 

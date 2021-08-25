@@ -5,11 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import androidx.core.util.Pair
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.kotlinmessenger.model.ChatItem.ChatFromItem
@@ -18,9 +17,10 @@ import com.example.kotlinmessenger.model.ChatMessage
 import com.example.kotlinmessenger.model.LatestMessageRow
 import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.model.UserItem
-import com.example.kotlinmessenger.view.*
+import com.example.kotlinmessenger.view.ChatLogActivity
+import com.example.kotlinmessenger.view.RegisterActivity
+import com.example.kotlinmessenger.view.ShowActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
@@ -29,27 +29,32 @@ import com.xwray.groupie.GroupieAdapter
 import java.util.*
 import kotlin.collections.HashMap
 
-class UserPageViewModel: ViewModel() {
+class UserPageViewModel : ViewModel() {
 
     val USER_KEY = "USER_KEY"
     val IMAGE_SELECT = 1
     val IMAGE_SHOW = "IMAGE_SHOW"
 
     val LatestMessagesAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
+    private var LatestOldList = mutableListOf<LatestMessageRow>()
+    private val latestMessageMap = HashMap<String, ChatMessage>()
+
     val NewMessageAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
+    var friendList = arrayOf<User>()
+
     val ChatLogAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     val chatInputText = MutableLiveData<String>("")
     var scrollPosition = MutableLiveData<Int>(0)
-
+    private lateinit var childEventListener: ChildEventListener
     private var selectedImageUri: Uri? = null
-    private val latestMessageMap = HashMap<String, ChatMessage>()
+    private var imageSelectedType = false
+
     var toUser: User? = User()
-    var friendList = arrayOf<User>()
+
 
     companion object {
         lateinit var currentUser: User
     }
-
 
 
     // --------------------- common Function -------------------------------------------------
@@ -91,12 +96,30 @@ class UserPageViewModel: ViewModel() {
                 })
     }
 
-    private fun refreshRecyclerViewMessages() {
-        LatestMessagesAdapter.value?.clear()
-        latestMessageMap.values.forEach {
-            LatestMessagesAdapter.value?.add(LatestMessageRow(it))
+    private fun refreshRecyclerViewMessages(addOrChangeType: String, changePosition: Int = 0, key: String = "") {
+        if (addOrChangeType == "Add") {
+            LatestMessagesAdapter.value?.clear()
+            LatestOldList.clear()
+            latestMessageMap.values.forEach {
+                LatestOldList.add(LatestMessageRow(it, addOrChangeType))
+            }
+            try {
+                LatestMessagesAdapter.value?.update(LatestOldList)
+            } catch (e: java.lang.Exception) {
+                Log.d("log", "error: ${e.message}")
+            }
+
+        } else if (addOrChangeType == "Change") {
+            LatestOldList[changePosition] = LatestMessageRow(latestMessageMap[key]!!, addOrChangeType)
+
+            try {
+                LatestMessagesAdapter.value?.update(LatestOldList)
+            } catch (e: java.lang.Exception) {
+                Log.d("log", "error: ${e.message}")
+            }
         }
     }
+
 
     fun listenForLatestMessages() {
 
@@ -114,7 +137,7 @@ class UserPageViewModel: ViewModel() {
 
                 Log.d("listenForLatestMessages", "latestMessageMap: ${latestMessageMap[snapshot.key]}, id: ${snapshot.key}")
 
-                refreshRecyclerViewMessages()
+                refreshRecyclerViewMessages("Add")
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -123,7 +146,13 @@ class UserPageViewModel: ViewModel() {
                 Log.d("listenForLatestMessages", "database onChildChanged!!!: ${chatMessage.text}")
 
                 latestMessageMap[snapshot.key!!] = chatMessage
-                refreshRecyclerViewMessages()
+                var latestChangePosition = 0
+                var i = 0
+                latestMessageMap.forEach { (key, _) ->
+                    if (key == snapshot.key!!) latestChangePosition = i
+                    i++
+                }
+                refreshRecyclerViewMessages("Change", latestChangePosition, snapshot.key!!)
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {}
@@ -259,53 +288,84 @@ class UserPageViewModel: ViewModel() {
         val fromId = FirebaseAuth.getInstance().uid!!
         val ref = FirebaseDatabase.getInstance()
                 .getReference("user-messages/$fromId/${toUser?.uid}")
+        val latestRef =  FirebaseDatabase.getInstance()
+                .getReference("latest-messages/$fromId")
 
-        ref.addChildEventListener(object : ChildEventListener {
+        childEventListener = ref.addChildEventListener(object : ChildEventListener {
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
                 Log.d("log", "add start")
                 Log.d("log", "adapter: ${ChatLogAdapter.value?.itemCount}")
-                Log.d("log", "snapshot: ${snapshot.getValue()}")
+                Log.d("log", "snapshot: ${snapshot.value}")
                 val chatMessage = snapshot.getValue(ChatMessage::class.java)
 
-                if (chatMessage != null) {
-                    Log.d("log", chatMessage.text)
-                    if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-                        val currentUser = currentUser
-                        ChatLogAdapter.value?.add(ChatFromItem(chatMessage.imageUrl, chatMessage.text, currentUser, activity))
-                    } else {
-                        ChatLogAdapter.value?.add(ChatToItem(chatMessage.imageUrl, chatMessage.text, toUser!!, activity))
-                    }
+                // alreadyReadへの既読処理
+                if (!chatMessage?.alreadyRead!!) {
+                    Log.d("log", snapshot.key!!)
+                    chatMessage.alreadyRead = true
                 }
+
+                Log.d("log", chatMessage.text)
+                if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
+                    val currentUser = currentUser
+                    ChatLogAdapter.value?.add(
+                        ChatFromItem(chatMessage.imageUrl, chatMessage.text, currentUser, activity)
+                    )
+                } else {
+                    ChatLogAdapter.value?.add(
+                        ChatToItem(chatMessage.imageUrl, chatMessage.text, toUser!!, activity)
+                    )
+                }
+
+                Log.d("log", "fromId: $fromId")
+                Log.d("log", "toUserId: ${toUser?.uid}")
+
+                // 既読したメッセージをデータベースへ保存
+                ref.updateChildren(mapOf(snapshot.key!! to chatMessage))
+                latestRef.updateChildren(mapOf(toUser?.uid to chatMessage))
 
 //                recyclerview_chat_log.scrollToPosition(ChatLogAdapter.value?.itemCount!! - 1)
                 scrollPosition.value = ChatLogAdapter.value?.itemCount!! - 1
 
             }
 
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-            }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
 
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-            }
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
 
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-            }
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
 
-            override fun onCancelled(error: DatabaseError) {
-            }
+            override fun onCancelled(error: DatabaseError) {}
         })
+    }
+
+    // addChildEventListenerデタッチ処理
+    fun eventlistenerFinish() {
+        val fromId = currentUser.uid
+        val ref = FirebaseDatabase.getInstance()
+            .getReference("user-messages/$fromId/${toUser?.uid}")
+        try {
+            ref.removeEventListener(childEventListener)
+            Log.d("log", "finish success!!")
+        } catch (e: java.lang.Exception) {
+            Log.d("log", "error: ${e.message}")
+        }
     }
 
 
     fun performSendMessage(activity: Activity, imageUri: String = "") {
 
-//        if (chatInputText.value!! == "") {
-//            printToast("テキストを入力してください", activity)
-//            return
-//        }
+        val notEmptyPattern = Regex(""".+""")
+        val omitToSpace = chatInputText.value!!.filter { !Regex("""\s""").matches(it.toString()) }
+        Log.d("log", "subText: [${omitToSpace}]")
+        Log.d("log", "${notEmptyPattern.matches(omitToSpace)}, ${omitToSpace.isEmpty()}, ${!imageSelectedType}")
+        if ((notEmptyPattern.matches(omitToSpace) || omitToSpace.isEmpty()) && !imageSelectedType) {
+            printToast("テキストを入力してください", activity)
+            return
+        }
 
+        imageSelectedType = false
         val fromId = FirebaseAuth.getInstance().uid!!
         val toId = toUser?.uid!!
 
@@ -315,13 +375,14 @@ class UserPageViewModel: ViewModel() {
 
         Log.d("log", "${reference.key!!}, ${chatInputText.value!!}, ${fromId}, ${toId}, ${System.currentTimeMillis() / 1000}")
         // クラスにして送らないと送信できない(Activityも落ちる)
-        val chatMessage = ChatMessage(reference.key!!, chatInputText.value!!, imageUri, fromId, toId, System.currentTimeMillis() / 1000)
+        val chatMessage = ChatMessage(reference.key!!, chatInputText.value!!, imageUri, fromId, toId, System.currentTimeMillis() / 1000, false)
         reference.setValue(chatMessage)
                 .addOnSuccessListener {
-                Log.d("log", "Saved our chat message to From: ${it}")
-                Log.d("log", "inputText: ${chatInputText.value}")
+                    Log.d("log", "Saved our chat message to From: ${it}")
+                    Log.d("log", "inputText: [${chatInputText.value}]")
+                    Log.d("log", "inputText length: [${chatInputText.value!!.length}]")
                     chatInputText.value = ""
-                Log.d("log", "inputText: ${chatInputText.value}")
+//                Log.d("log", "inputText: ${chatInputText.value}")
 //                    recyclerview_chat_log.scrollToPosition(ChatLogAdapter.value?.itemCount!! - 1)
                     try {
                         scrollPosition.value = ChatLogAdapter.value?.itemCount!! - 1
@@ -352,6 +413,7 @@ class UserPageViewModel: ViewModel() {
     }
 
     fun imageSelectedFunction(data: Intent?, activity: Activity) {
+        imageSelectedType = true
         selectedImageUri = data?.data
 
         val filename = UUID.randomUUID().toString()
@@ -363,8 +425,6 @@ class UserPageViewModel: ViewModel() {
                         performSendMessage(activity, it.toString())
                     }
                 }
-
-
     }
 
     @SuppressWarnings("unchecked")

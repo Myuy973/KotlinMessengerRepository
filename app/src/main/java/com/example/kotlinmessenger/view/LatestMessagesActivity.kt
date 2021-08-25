@@ -1,12 +1,16 @@
 package com.example.kotlinmessenger.view
 
 import android.content.Intent
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.kotlinmessenger.R
@@ -23,6 +27,7 @@ import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.android.synthetic.main.activity_latest_messages.*
+import kotlinx.android.synthetic.main.latest_message_row.view.*
 import java.util.Calendar.getInstance
 
 class LatestMessagesActivity : AppCompatActivity() {
@@ -30,17 +35,20 @@ class LatestMessagesActivity : AppCompatActivity() {
     private val viewModel: UserPageViewModel by viewModels()
 
     private lateinit var binding: ActivityLatestMessagesBinding
+    private lateinit var latestMessageResource: Resources
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_latest_messages)
+        latestMessageResource = resources
 
         recycler_latest_messages.adapter = viewModel.LatestMessagesAdapter.value
         // カード間にボーダー
         recycler_latest_messages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
         viewModel.LatestMessagesAdapter.value?.setOnItemClickListener { item, view ->
+            view.newMessageIAnimIcon.visibility = View.INVISIBLE
             val row = item as LatestMessageRow
             val intent = Intent(this, ChatLogActivity::class.java)
             intent.putExtra(viewModel.USER_KEY, row.chatPartnerUser)
@@ -61,9 +69,6 @@ class LatestMessagesActivity : AppCompatActivity() {
                 overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
             }
         }
-
-//        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
-//        overridePendingTransition(R.anim.anim_chat_ather_open, R.anim.anim_chat_main_close)
 
         viewModel.verifyUserIsLoggedIn(this)
         viewModel.fetchCurrentUser()
@@ -107,5 +112,11 @@ class LatestMessagesActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+//    fun getBackgroundColor(): List<Int> {
+////        Log.d("log", "resources: ${ ?: "null"}")
+//        val from_color = getColor( R.color.latest_message_card_before_color)
+//        val to_color = getColor(R.color.latest_message_card_after_color)
+//        return listOf(from_color, to_color)
+//    }
 
 }

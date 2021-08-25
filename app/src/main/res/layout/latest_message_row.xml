@@ -5,24 +5,26 @@
 
 <!--    タップフィードバック-->
     <androidx.cardview.widget.CardView
+        android:id="@+id/latest_message_row_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusable="true"
         android:clickable="true"
+        android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/latest_row_content"
             android:layout_width="match_parent"
             android:layout_height="120dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imageview_latest_messager"
-                app:civ_border_width="2dp"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                app:civ_border_width="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -35,24 +37,37 @@
                 android:layout_marginStart="16sp"
                 android:text="Username"
                 android:textColor="@color/black"
-                tools:text="Username"
                 app:layout_constraintBottom_toTopOf="@+id/message_textview_latest_messager"
                 app:layout_constraintStart_toEndOf="@+id/imageview_latest_messager"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed" />
+                app:layout_constraintTop_toTopOf="@+id/imageview_latest_messager"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="Username" />
 
             <TextView
                 android:id="@+id/message_textview_latest_messager"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
+                android:maxHeight="50dp"
                 android:text="Latest Message"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/newMessageIAnimIcon"
                 app:layout_constraintStart_toEndOf="@+id/imageview_latest_messager"
                 app:layout_constraintTop_toBottomOf="@+id/username_textview_latest_messager" />
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/newMessageIAnimIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/bell" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

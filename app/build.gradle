@@ -117,5 +117,8 @@ dependencies {
     implementation 'org.twitter4j:twitter4j-core:4.0.7'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
 
+    // lottie animation
+    implementation 'com.airbnb.android:lottie:3.3.1'
+
 
 }

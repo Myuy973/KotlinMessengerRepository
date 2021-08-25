@@ -5,7 +5,8 @@ class ChatMessage(val id: String,
                   val imageUrl: String,
                   val fromId: String,
                   val toId: String,
-                  val timestamp: Long) {
-    constructor(): this("", "", "", "", "", -1)
+                  val timestamp: Long,
+                  var alreadyRead: Boolean) {
+    constructor(): this("", "", "", "", "", 0L, false)
 }
 
