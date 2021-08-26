@@ -359,8 +359,8 @@ class UserPageViewModel : ViewModel() {
         val notEmptyPattern = Regex(""".+""")
         val omitToSpace = chatInputText.value!!.filter { !Regex("""\s""").matches(it.toString()) }
         Log.d("log", "subText: [${omitToSpace}]")
-        Log.d("log", "${notEmptyPattern.matches(omitToSpace)}, ${omitToSpace.isEmpty()}, ${!imageSelectedType}")
-        if ((notEmptyPattern.matches(omitToSpace) || omitToSpace.isEmpty()) && !imageSelectedType) {
+        Log.d("log", "${!notEmptyPattern.matches(omitToSpace)}, ${omitToSpace.isEmpty()}, ${!imageSelectedType}")
+        if ((!notEmptyPattern.matches(omitToSpace) || omitToSpace.isEmpty()) && !imageSelectedType) {
             printToast("テキストを入力してください", activity)
             return
         }

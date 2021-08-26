@@ -8,11 +8,13 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.Settings.Global.getString
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.view.LatestMessagesActivity
+import com.example.kotlinmessenger.view.RegisterActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -23,18 +25,23 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.lang.IllegalStateException
 import java.util.*
 
 class LoginViewModel: ViewModel() {
 
     val IMAGE_INPUT = 1
     val GOOGLE_SIGNIN = 2
+
+    // progressBar visibility
+    val rogressbarType = MutableLiveData<Int>(View.GONE)
 
     // -------------------- email signin -----------------------------
 
@@ -189,6 +196,7 @@ class LoginViewModel: ViewModel() {
         val user = User(uid, userName, userEmail,  profileImageUri)
 
         ref.setValue(user).addOnSuccessListener {
+            toastPrint("ようこそ ${user.userName}さん", activity)
             Log.d("log", "Finally we saved the user to Firebase Database")
             val intent = Intent(activity, LatestMessagesActivity::class.java)
             intent.putExtra("fromActivity", "LoginActivity")
@@ -196,6 +204,7 @@ class LoginViewModel: ViewModel() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             activity.startActivity(intent)
         }.addOnFailureListener {
+            rogressbarType.value = View.GONE
             Log.d("log", "save is not Success")
         }
     }
@@ -226,6 +235,7 @@ class LoginViewModel: ViewModel() {
 
         Log.d("log", "registerbutton push")
 
+        rogressbarType.value = View.VISIBLE
         val shortActivityName = activity.componentName.shortClassName
         var email = ""
         var pass = ""
@@ -236,6 +246,7 @@ class LoginViewModel: ViewModel() {
                 email = userEmail.value!!
                 pass = userPassword.value!!
                 if (signErrorMessage.isNotEmpty()) {
+                    rogressbarType.value = View.GONE
                     val error = signErrorMessage.joinToString(separator = "\n")
                     toastPrint(error, activity)
                     Log.d("log", error)
@@ -246,6 +257,7 @@ class LoginViewModel: ViewModel() {
                 email = loginUserEmail.value!!
                 pass = loginUserPass.value!!
                 if (loginErrorMessage.isNotEmpty()) {
+                    rogressbarType.value = View.GONE
                     val error = loginErrorMessage.joinToString(separator = "\n")
                     toastPrint(error, activity)
                     Log.d("log", error)
@@ -257,49 +269,55 @@ class LoginViewModel: ViewModel() {
 
         when (shortActivityName) {
             ".view.RegisterActivity" -> {
-                Log.d("log",  "register activity")
+                Log.d("log", "register activity")
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass)
-                    .addOnCompleteListener {
-                        if (!it.isSuccessful) return@addOnCompleteListener
-                        toastPrint("Login Successfully", activity)
-                        uploadImageToFirebaseStorage(activity, email)
-                    }
-                .addOnFailureListener {
-                    toastPrint("Failed to create user: ${it.message}", activity)
-                }
+                        .addOnCompleteListener {
+                            if (!it.isSuccessful) return@addOnCompleteListener
+//                            toastPrint("Login Successfully", activity)
+                            uploadImageToFirebaseStorage(activity, email)
+                        }
+                        .addOnFailureListener {
+                            rogressbarType.value = View.GONE
+                            Log.d("log", "error: ${it.message}")
+                            toastPrint("ユーザー作成に失敗しました。", activity)
+                        }
             }
             ".view.LoginActivity" -> {
-                Log.d("log",  "loginActivity")
+                Log.d("log", "loginActivity")
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
-                    .addOnSuccessListener {
-                        val intent = Intent(activity, LatestMessagesActivity::class.java)
-                        intent.putExtra("fromActivity", "LoginActivity")
-                        // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        activity.startActivity(intent)
+                        .addOnSuccessListener { data ->
+                            // ログインユーザーの名前取得
+//                            val ref = FirebaseDatabase.getInstance()
+//                                    .getReference("users/${data.user?.uid}")
+//                            ref.get().addOnSuccessListener {
+//                                toastPrint("ようこそ ${it.getValue(User::class.java)?.userName}", activity)
+//                            }
 
-                        Log.d("log",  "Successfully Login")
-                        toastPrint( "Successfully Login", activity)
-                    }
-                    .addOnFailureListener {
-                        Log.d("log",  "Failed to login: ${it.message}")
-                        when (it.message!!) {
+                            val intent = Intent(activity, LatestMessagesActivity::class.java)
+                            intent.putExtra("fromActivity", "LoginActivity")
+                            // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            activity.startActivity(intent)
 
-                            errorMessageList["passMissMatch"],
-                            errorMessageList["userNotFound"] -> {
-                                toastPrint("メールアドレスまたはパスワードが違います。", activity)
-                            }
-                            errorMessageList["passTooWrong"] -> {
-                                toastPrint("規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。", activity)
-                            }
-
+                            Log.d("log", "Successfully Login")
+                            rogressbarType.value = View.GONE
                         }
-                    }
-            }
+                        .addOnFailureListener {
+                            Log.d("log", "Failed to login: ${it.message}")
+                            rogressbarType.value = View.GONE
+                            when (it.message!!) {
+                                errorMessageList["passMissMatch"],
+                                errorMessageList["userNotFound"] -> {
+                                    toastPrint("メールアドレスまたはパスワードが違います。", activity)
+                                }
+                                errorMessageList["passTooWrong"] -> {
+                                    toastPrint("規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。", activity)
+                                }
+
+                            }
+                        }
+                }
         }
-
-
-
     }
 
     private fun uploadImageToFirebaseStorage(activity: Activity, userEmail: String) {
@@ -317,6 +335,7 @@ class LoginViewModel: ViewModel() {
                 }
             }
             .addOnFailureListener { e ->
+                rogressbarType.value = View.GONE
                 Log.d("log", "error: ${e.printStackTrace()}")
             }
     }

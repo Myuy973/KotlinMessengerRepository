@@ -9,6 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.example.kotlinmessenger.R
@@ -32,6 +33,7 @@ class RegisterActivity : AppCompatActivity() {
 
 
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var activity: RegisterActivity
 
     private val viewModel : LoginViewModel by viewModels()
 
@@ -68,9 +70,7 @@ class RegisterActivity : AppCompatActivity() {
 
         overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
 
-
     }
-
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,5 +89,6 @@ class RegisterActivity : AppCompatActivity() {
         }
 
     }
+
 
 }

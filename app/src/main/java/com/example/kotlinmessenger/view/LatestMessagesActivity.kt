@@ -62,6 +62,7 @@ class LatestMessagesActivity : AppCompatActivity() {
         when(fromActivity) {
             "LoginActivity" -> {
                 Log.d("log", "fromActivity: LoginActivity")
+                viewModel.printToast("ようこそ ${UserPageViewModel.currentUser.userName}", this)
                 overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
             }
             else -> {
