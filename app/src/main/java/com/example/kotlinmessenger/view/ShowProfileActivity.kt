@@ -1,12 +1,10 @@
 package com.example.kotlinmessenger.view
 
-import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.asFlow
@@ -16,11 +14,9 @@ import com.example.kotlinmessenger.viewModel.UserPageViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show_profile.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.lang.Exception
-import kotlin.coroutines.coroutineContext
 
 class ShowProfileActivity : AppCompatActivity() {
 
@@ -64,6 +60,11 @@ class ShowProfileActivity : AppCompatActivity() {
             liveData.asFlow()
                 .onEach { viewModel.userdataUpdate(this) }
                 .launchIn(GlobalScope)
+        }
+
+
+        update_progressBar.setOnTouchListener { _, _ ->
+            true
         }
 
 

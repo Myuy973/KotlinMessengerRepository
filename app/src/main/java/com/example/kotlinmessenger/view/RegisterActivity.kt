@@ -68,6 +68,8 @@ class RegisterActivity : AppCompatActivity() {
             viewModel.twitterSignin(this)
         }
 
+        signin_progressBar.setOnTouchListener { _, _ -> true }
+
         overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
 
     }

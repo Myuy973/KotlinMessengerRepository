@@ -145,7 +145,7 @@
             app:srcCompat="@drawable/ic_iconmonstr_twitter_2" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/login_progressBar"
+            android:id="@+id/signin_progressBar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="20dp"
