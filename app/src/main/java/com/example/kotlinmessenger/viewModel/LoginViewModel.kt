@@ -286,12 +286,6 @@ class LoginViewModel: ViewModel() {
                 Log.d("log", "loginActivity")
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
                         .addOnSuccessListener { data ->
-                            // ログインユーザーの名前取得
-//                            val ref = FirebaseDatabase.getInstance()
-//                                    .getReference("users/${data.user?.uid}")
-//                            ref.get().addOnSuccessListener {
-//                                toastPrint("ようこそ ${it.getValue(User::class.java)?.userName}", activity)
-//                            }
 
                             val intent = Intent(activity, LatestMessagesActivity::class.java)
                             intent.putExtra("fromActivity", "LoginActivity")

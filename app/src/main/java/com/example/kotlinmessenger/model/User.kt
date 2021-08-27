@@ -8,9 +8,9 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 @IgnoreExtraProperties
 data class User(
-    val uid: String,
-    val userName: String,
-    val userEmail: String,
-    val profileImageUri: String): Parcelable {
+    var uid: String,
+    var userName: String,
+    var userEmail: String,
+    var profileImageUri: String): Parcelable {
     constructor(): this( "",  "", "", "")
 }

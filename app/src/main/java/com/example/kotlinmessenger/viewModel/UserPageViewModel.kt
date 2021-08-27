@@ -6,11 +6,11 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.kotlinmessenger.model.ChatItem.ChatFromItem
 import com.example.kotlinmessenger.model.ChatItem.ChatToItem
 import com.example.kotlinmessenger.model.ChatMessage
@@ -23,9 +23,14 @@ import com.example.kotlinmessenger.view.ShowActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupieAdapter
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import okhttp3.Dispatcher
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -38,6 +43,18 @@ class UserPageViewModel : ViewModel() {
     val LatestMessagesAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     private var LatestOldList = mutableListOf<LatestMessageRow>()
     private val latestMessageMap = HashMap<String, ChatMessage>()
+
+    var updateProfileErrorList = mutableListOf<String>()
+    lateinit var currentUserCopy: User
+    val editUserNameText = MutableLiveData<String>("")
+    val editUserEmailText = MutableLiveData<String>("")
+    val emailUpdateProcess = MutableLiveData<String>("")
+    val editUserPassText = MutableLiveData<String>("")
+    val passUpdateProcess = MutableLiveData<String>("")
+    val updateButtonType = MutableLiveData<Boolean>(false)
+    var updateAccessLimiter = false
+    val rogressbarType = MutableLiveData<Int>(View.GONE)
+
 
     val NewMessageAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     var friendList = arrayOf<User>()
@@ -161,6 +178,161 @@ class UserPageViewModel : ViewModel() {
 
             override fun onCancelled(error: DatabaseError) {}
         })
+    }
+
+
+    // ------------------------------ showProfileActivity ------------------------------------------------------------
+
+    fun userInfoDisplay(userName: String = currentUser.userName, userEmail: String = currentUser.userEmail) {
+        editUserNameText.value = userName
+        editUserEmailText.value = userEmail
+        editUserPassText.value = ""
+        Log.d("log", "currentuser: ${currentUser.userName}, ${currentUser.userEmail}")
+        Log.d("log", "edittext: ${editUserNameText.value}, ${editUserEmailText.value}")
+    }
+
+    fun setUpchecker() {
+        listOf(editUserNameText, editUserEmailText, editUserPassText).forEach { liveData ->
+            liveData.asFlow()
+                    .onEach { inputTextCheck() }
+                    .launchIn(viewModelScope)
+        }
+    }
+
+    fun inputTextCheck() {
+        updateButtonType.value =
+                editUserEmailText.value?.isNotEmpty()!! &&
+                editUserEmailText.value?.isNotEmpty()!! &&
+                editUserPassText.value?.isNotEmpty()!!
+    }
+
+    fun userProfileUpdate(activity: Activity) {
+
+        updateAccessLimiter = false
+        rogressbarType.value = View.VISIBLE
+
+        Log.d("log", "input Text: ${editUserNameText.value}, ${editUserEmailText.value}, ${editUserPassText.value}")
+        updateProfileErrorList = mutableListOf()
+
+        // 入力されたデータのチェック
+        if (editUserNameText.value?.isEmpty()!!) {
+            updateProfileErrorList.add("userNameを入力してください")
+        }
+        val emailPattern = Regex("""[a-zA-Z0-9._-]+@[a-z]+\.+[a-z]+""")
+        if (!emailPattern.matches(editUserEmailText.value.toString())) {
+            updateProfileErrorList.add("正しいメールアドレスを入力してください")
+        }
+        val passPattern = Regex("""^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,100}${'$'}""")
+        if (!passPattern.matches(editUserPassText.value.toString())) {
+            updateProfileErrorList.add("パスワードが英数字8文字以上ではありません")
+        }
+
+        if (updateProfileErrorList.isNotEmpty()) {
+            val errorMessage = updateProfileErrorList.joinToString(separator = "\n")
+            printToast(errorMessage, activity)
+            rogressbarType.value = View.GONE
+            return
+        }
+
+        // 更新処理
+
+        val currentUserAuth = FirebaseAuth.getInstance().currentUser
+        currentUserCopy = currentUser.copy()
+
+        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
+        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
+
+        // userName
+        if (editUserNameText.value != currentUser.userName) {
+            Log.d("log", "name change")
+            currentUserCopy.userName = editUserNameText.value!!
+        }
+
+        // userEmail
+        if (editUserEmailText.value != currentUser.userEmail) {
+            Log.d("log", "email change: ${editUserEmailText.value}")
+            currentUserAuth?.updateEmail(editUserEmailText.value!!)
+                    ?.addOnSuccessListener {
+                        Log.d("log", "email change success: ${Thread.currentThread().name}")
+                        currentUserCopy.userEmail = editUserEmailText.value!!
+                        emailUpdateProcess.value = "ok"
+                    }
+                    ?.addOnFailureListener {
+                        emailUpdateProcess.value = "error"
+                        updateProfileErrorList.add(errorSetter(it.message!!))
+                        Log.d("log", "email error : ${it.message}")
+                    }
+        } else { emailUpdateProcess.value = "ok" }
+
+        // userPass
+        if (editUserPassText.value != "") {
+            Log.d("log", "pass change: ${editUserPassText.value}")
+            currentUserAuth?.updatePassword(editUserPassText.value!!)
+                    ?.addOnSuccessListener {
+                        passUpdateProcess.value = "ok"
+                    }
+                    ?.addOnFailureListener {
+                        Log.d("log", "pass change failed: ${Thread.currentThread().name}")
+                        passUpdateProcess.value = "error"
+                        updateProfileErrorList.add(errorSetter(it.message!!))
+                        Log.d("log", "pass error : ${it.message}")
+                    }
+        } else { passUpdateProcess.value = "ok" }
+
+
+    }
+
+    // 更新処理
+    suspend fun userdataUpdate(activity: Activity) {
+
+        Log.d("log", "userdataUpdate start")
+        Log.d("log", "emailUpdateProcess: ${emailUpdateProcess.value}, passUpdateProcess: ${passUpdateProcess.value} ")
+        if (emailUpdateProcess.value == "" || passUpdateProcess.value == "" || updateAccessLimiter) {
+            Log.d("log", "userdataUpdate cancel")
+            return
+        }
+
+        updateAccessLimiter = true
+
+        val ref = FirebaseDatabase.getInstance().getReference("users")
+
+        // currentUserCopyのデータに変化があれば更新
+        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
+        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
+        if (currentUser != currentUserCopy) {
+            Log.d("log", "user change")
+            ref.updateChildren(mapOf(currentUser.uid to currentUserCopy))
+                    .addOnSuccessListener {
+                        Log.d("log", "user change success")
+                    }
+        }
+
+        Log.d("log", "errorlist ${updateProfileErrorList}")
+        withContext(Dispatchers.Main) {
+            if (updateProfileErrorList.isNotEmpty()) {
+                rogressbarType.value = View.GONE
+                if (updateProfileErrorList[0] == updateProfileErrorList[1]) {
+                    printToast(updateProfileErrorList[0], activity)
+                    return@withContext
+                }
+                val errorMessage = updateProfileErrorList.joinToString(separator = "\n")
+                printToast(errorMessage, activity)
+            } else {
+                rogressbarType.value = View.GONE
+                fetchCurrentUser()
+                userInfoDisplay(currentUserCopy.userName, currentUserCopy.userEmail)
+                printToast("更新完了", activity)
+            }
+        }
+    }
+
+    // エラーメッセージからユーザへのメッセージを選別
+    private fun errorSetter(error: String): String {
+        return when (error) {
+            "This operation is sensitive and requires recent authentication. Log in again before retrying this request." ->
+                "再度ログインしてください"
+            else -> "error"
+        }
     }
 
 
