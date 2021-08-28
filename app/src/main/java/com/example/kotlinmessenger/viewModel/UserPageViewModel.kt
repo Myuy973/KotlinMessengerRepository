@@ -2,7 +2,9 @@ package com.example.kotlinmessenger.viewModel
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -37,6 +39,7 @@ import kotlin.collections.HashMap
 class UserPageViewModel : ViewModel() {
 
     val USER_KEY = "USER_KEY"
+    val PROFILE_IMAGE_CHANGE = 2
     val IMAGE_SELECT = 1
     val IMAGE_SHOW = "IMAGE_SHOW"
 
@@ -46,6 +49,9 @@ class UserPageViewModel : ViewModel() {
 
     var updateProfileErrorList = mutableListOf<String>()
     lateinit var currentUserCopy: User
+    lateinit var profileImageUri: Uri
+    val bitmap = MutableLiveData<Bitmap?>(null)
+    val imageUpdateProcess = MutableLiveData<String>("")
     val editUserNameText = MutableLiveData<String>("")
     val editUserEmailText = MutableLiveData<String>("")
     val emailUpdateProcess = MutableLiveData<String>("")
@@ -199,6 +205,11 @@ class UserPageViewModel : ViewModel() {
         }
     }
 
+    fun profileImageChange(data: Intent?, activity: Activity) {
+        profileImageUri = data?.data!!
+        bitmap.value = MediaStore.Images.Media.getBitmap(activity.contentResolver, profileImageUri)
+    }
+
     fun inputTextCheck() {
         updateButtonType.value =
                 editUserEmailText.value?.isNotEmpty()!! &&
@@ -241,6 +252,23 @@ class UserPageViewModel : ViewModel() {
 
         Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
         Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
+
+        // user image
+        if (bitmap.value != null) {
+            val filename = UUID.randomUUID().toString()
+            val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
+            ref.putFile(profileImageUri)
+                    .addOnSuccessListener {
+                        ref.downloadUrl.addOnSuccessListener {
+                            currentUserCopy.profileImageUri = it.toString()
+                            imageUpdateProcess.value = "ok"
+                        }
+                    }
+                    .addOnFailureListener {
+                        imageUpdateProcess.value = "error"
+                        updateProfileErrorList.add(errorSetter(it.message!!))
+                    }
+        }
 
         // userName
         if (editUserNameText.value != currentUser.userName) {
@@ -287,7 +315,7 @@ class UserPageViewModel : ViewModel() {
 
         Log.d("log", "userdataUpdate start")
         Log.d("log", "emailUpdateProcess: ${emailUpdateProcess.value}, passUpdateProcess: ${passUpdateProcess.value} ")
-        if (emailUpdateProcess.value == "" || passUpdateProcess.value == "" || updateAccessLimiter) {
+        if (imageUpdateProcess.value == "" || emailUpdateProcess.value == "" || passUpdateProcess.value == "" || updateAccessLimiter) {
             Log.d("log", "userdataUpdate cancel")
             return
         }

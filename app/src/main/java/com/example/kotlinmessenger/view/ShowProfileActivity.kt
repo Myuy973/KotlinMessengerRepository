@@ -1,8 +1,10 @@
 package com.example.kotlinmessenger.view
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -34,6 +36,8 @@ class ShowProfileActivity : AppCompatActivity() {
 
         // profile imageview
         Picasso.get().load(currentUserData.profileImageUri).into(binding.profileUserImageview)
+        // profile image change
+        image_change_icon.setOnClickListener { profileImageSelect() }
 
         // profile user id
         profile_user_id_text.text = currentUserData.uid
@@ -56,17 +60,33 @@ class ShowProfileActivity : AppCompatActivity() {
 
         updataToProfileButton.setOnClickListener { viewModel.userProfileUpdate(this) }
 
-        listOf(viewModel.emailUpdateProcess, viewModel.passUpdateProcess).forEach { liveData ->
-            liveData.asFlow()
-                .onEach { viewModel.userdataUpdate(this) }
-                .launchIn(GlobalScope)
+        // email, pass, imageそれぞれの更新処理が終わっているかチェック
+        listOf( viewModel.emailUpdateProcess,
+                viewModel.passUpdateProcess,
+                viewModel.imageUpdateProcess).forEach { liveData ->
+                    liveData.asFlow()
+                        .onEach { viewModel.userdataUpdate(this) }
+                        .launchIn(GlobalScope)
         }
 
 
-        update_progressBar.setOnTouchListener { _, _ ->
-            true
-        }
-
+        update_progressBar.setOnTouchListener { _, _ -> true }
 
     }
+
+    private fun profileImageSelect() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, viewModel.PROFILE_IMAGE_CHANGE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == viewModel.PROFILE_IMAGE_CHANGE && resultCode == Activity.RESULT_OK) {
+            viewModel.profileImageChange(data, this)
+        }
+    }
+
+
+
 }

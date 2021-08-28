@@ -60,9 +60,8 @@ class LatestMessagesActivity : AppCompatActivity() {
         Log.d("log", "fromActivity: $fromActivity")
 
         when(fromActivity) {
-            "LoginActivity" -> {
-                Log.d("log", "fromActivity: LoginActivity")
-                viewModel.printToast("ようこそ ${UserPageViewModel.currentUser.userName}", this)
+            "SigninOrLogin" -> {
+                Log.d("log", "fromActivity: SigninOrLogin")
                 overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
             }
             else -> {

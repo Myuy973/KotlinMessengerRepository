@@ -41,7 +41,7 @@ class LoginViewModel: ViewModel() {
     val GOOGLE_SIGNIN = 2
 
     // progressBar visibility
-    val rogressbarType = MutableLiveData<Int>(View.GONE)
+    val progressbarType = MutableLiveData<Int>(View.GONE)
 
     // -------------------- email signin -----------------------------
 
@@ -98,6 +98,7 @@ class LoginViewModel: ViewModel() {
         Log.d("log", "start Login view model")
 
         auth = Firebase.auth
+        progressbarType.value = View.GONE
 
         // それぞれ変更されたら全項目が入力済みかチェック
         listOf(userName, userEmail, userPassword).forEach { liveData ->
@@ -199,12 +200,12 @@ class LoginViewModel: ViewModel() {
             toastPrint("ようこそ ${user.userName}さん", activity)
             Log.d("log", "Finally we saved the user to Firebase Database")
             val intent = Intent(activity, LatestMessagesActivity::class.java)
-            intent.putExtra("fromActivity", "LoginActivity")
+            intent.putExtra("fromActivity", "SigninOrLogin")
             // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             activity.startActivity(intent)
         }.addOnFailureListener {
-            rogressbarType.value = View.GONE
+            progressbarType.value = View.GONE
             Log.d("log", "save is not Success")
         }
     }
@@ -223,7 +224,6 @@ class LoginViewModel: ViewModel() {
     }
 
     fun inputImage(activity: Activity) {
-//        Log.d("log", "activity: ${activity.componentName.shortClassName.matches(Regex(""".*RegisterActivity"""))}")
         startActivityForResultIntent = Intent(Intent.ACTION_PICK)
         startActivityForResultIntent.type = "image/*"
         requestCode = IMAGE_INPUT
@@ -235,7 +235,7 @@ class LoginViewModel: ViewModel() {
 
         Log.d("log", "registerbutton push")
 
-        rogressbarType.value = View.VISIBLE
+        progressbarType.value = View.VISIBLE
         val shortActivityName = activity.componentName.shortClassName
         var email = ""
         var pass = ""
@@ -246,7 +246,7 @@ class LoginViewModel: ViewModel() {
                 email = userEmail.value!!
                 pass = userPassword.value!!
                 if (signErrorMessage.isNotEmpty()) {
-                    rogressbarType.value = View.GONE
+                    progressbarType.value = View.GONE
                     val error = signErrorMessage.joinToString(separator = "\n")
                     toastPrint(error, activity)
                     Log.d("log", error)
@@ -257,7 +257,7 @@ class LoginViewModel: ViewModel() {
                 email = loginUserEmail.value!!
                 pass = loginUserPass.value!!
                 if (loginErrorMessage.isNotEmpty()) {
-                    rogressbarType.value = View.GONE
+                    progressbarType.value = View.GONE
                     val error = loginErrorMessage.joinToString(separator = "\n")
                     toastPrint(error, activity)
                     Log.d("log", error)
@@ -277,7 +277,7 @@ class LoginViewModel: ViewModel() {
                             uploadImageToFirebaseStorage(activity, email)
                         }
                         .addOnFailureListener {
-                            rogressbarType.value = View.GONE
+                            progressbarType.value = View.GONE
                             Log.d("log", "error: ${it.message}")
                             toastPrint("ユーザー作成に失敗しました。", activity)
                         }
@@ -287,18 +287,23 @@ class LoginViewModel: ViewModel() {
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
                         .addOnSuccessListener { data ->
 
+                            val ref = FirebaseDatabase.getInstance().getReference("users/${data.user?.uid}")
+                            ref.get().addOnSuccessListener {
+                                val user = it.getValue(User::class.java)
+                                toastPrint("ようこそ ${user?.userName}", activity)
+                            }
+
                             val intent = Intent(activity, LatestMessagesActivity::class.java)
-                            intent.putExtra("fromActivity", "LoginActivity")
+                            intent.putExtra("fromActivity", "SigninOrLogin")
                             // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
                             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             activity.startActivity(intent)
 
                             Log.d("log", "Successfully Login")
-                            rogressbarType.value = View.GONE
                         }
                         .addOnFailureListener {
                             Log.d("log", "Failed to login: ${it.message}")
-                            rogressbarType.value = View.GONE
+                            progressbarType.value = View.GONE
                             when (it.message!!) {
                                 errorMessageList["passMissMatch"],
                                 errorMessageList["userNotFound"] -> {
@@ -329,7 +334,7 @@ class LoginViewModel: ViewModel() {
                 }
             }
             .addOnFailureListener { e ->
-                rogressbarType.value = View.GONE
+                progressbarType.value = View.GONE
                 Log.d("log", "error: ${e.printStackTrace()}")
             }
     }
