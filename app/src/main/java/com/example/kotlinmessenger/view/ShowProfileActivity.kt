@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.asFlow
@@ -32,6 +34,7 @@ class ShowProfileActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
+
         val currentUserData = UserPageViewModel.currentUser
 
         // profile imageview
@@ -53,6 +56,7 @@ class ShowProfileActivity : AppCompatActivity() {
             }
         }
 
+        // editUserNameText, editUserEmailText, editUserPassText チェッカー起動
         viewModel.setUpchecker()
 
         // ユーザー情報をLiveDataへ

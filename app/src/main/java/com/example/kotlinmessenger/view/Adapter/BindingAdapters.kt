@@ -1,6 +1,7 @@
 package com.example.kotlinmessenger.view.Adapter
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.View
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,10 @@ object BindingAdapters {
     @BindingAdapter("bitmap")
     @JvmStatic
     fun imageBitmapSet(view: CircleImageView, bitmap: Bitmap?) {
-        view.setImageBitmap(bitmap)
+        Log.d("log", "imageBitmapSet start")
+        if (bitmap != null) {
+            view.setImageBitmap(bitmap)
+        }
     }
 
     @BindingAdapter("chatPageScroll")

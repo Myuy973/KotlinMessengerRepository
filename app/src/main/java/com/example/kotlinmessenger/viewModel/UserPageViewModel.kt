@@ -496,9 +496,8 @@ class UserPageViewModel : ViewModel() {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
                 Log.d("log", "add start")
-                Log.d("log", "adapter: ${ChatLogAdapter.value?.itemCount}")
-                Log.d("log", "snapshot: ${snapshot.value}")
                 val chatMessage = snapshot.getValue(ChatMessage::class.java)
+
 
                 // alreadyReadへの既読処理
                 if (!chatMessage?.alreadyRead!!) {

@@ -1,6 +1,8 @@
 package com.example.kotlinmessenger.model.ChatItem
 
 import android.app.Activity
+import android.icu.number.NumberFormatter.with
+import android.net.Uri
 import android.opengl.Visibility
 import android.text.SpannableStringBuilder
 import android.util.Log
@@ -11,6 +13,7 @@ import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ChatFromRowBinding
 import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.databinding.BindableItem
 
@@ -19,7 +22,7 @@ class ChatFromItem(val imageUri: String, val text: String, val user: User, val a
 
         if (imageUri == "") {
 
-            viewBinding.sendImage.visibility = View.INVISIBLE
+            viewBinding.sendImage.visibility = View.GONE
 
             viewBinding.textView.text = text
             val uri = user.profileImageUri
@@ -34,15 +37,19 @@ class ChatFromItem(val imageUri: String, val text: String, val user: User, val a
                 viewBinding.textView.setBackgroundResource(R.drawable.image_description_text)
             }
 
+            val sendImageUri = Uri.parse(imageUri)
             val sendImageView = viewBinding.sendImage
-            Picasso.get().load(imageUri).into(sendImageView)
+            sendImageView.setImageURI(sendImageUri)
+
             sendImageView.setOnClickListener {
                 UserPageViewModel().changeToShowActivity(sendImageView as View, imageUri, activity)
             }
 
-            val uri = user.profileImageUri
+            val uri = Uri.parse(user.profileImageUri)
             val userImageView = viewBinding.imageviewChatFromRow
-            Picasso.get().load(uri).into(userImageView)
+            userImageView.setImageURI(uri)
+//            Picasso.get().load(uri).into(userImageView)
+
         }
 
     }

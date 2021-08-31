@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,19 +22,32 @@
             app:layout_constraintStart_toEndOf="@+id/imageview_chat_from_row"
             app:layout_constraintTop_toTopOf="@+id/imageview_chat_from_row" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
+<!--        <de.hdodenhof.circleimageview.CircleImageView-->
+<!--            android:id="@+id/imageview_chat_from_row"-->
+<!--            android:layout_width="35dp"-->
+<!--            android:layout_height="35dp"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            app:civ_border_color="@android:color/black"-->
+<!--            app:civ_border_width="2dp"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:srcCompat="@color/black" />-->
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/imageview_chat_from_row"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            fresco:roundAsCircle="true"
             app:civ_border_color="@android:color/black"
             app:civ_border_width="2dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@color/black" />
 
-        <ImageView
+
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/send_image"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
@@ -43,7 +57,19 @@
             android:scaleType="centerCrop"
             app:layout_constraintStart_toEndOf="@+id/imageview_chat_from_row"
             app:layout_constraintTop_toBottomOf="@+id/textView"
-            tools:srcCompat="@tools:sample/avatars" />
+            tools:src="@tools:sample/avatars" />
+
+<!--        <ImageView-->
+<!--            android:id="@+id/send_image"-->
+<!--            android:layout_width="240dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:maxHeight="500dp"-->
+<!--            android:scaleType="centerCrop"-->
+<!--            android:adjustViewBounds="true"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/imageview_chat_from_row"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/textView"-->
+<!--            tools:srcCompat="@tools:sample/avatars" />-->
 
         <!--        <EditText-->
 <!--            android:id="@+id/textView"-->

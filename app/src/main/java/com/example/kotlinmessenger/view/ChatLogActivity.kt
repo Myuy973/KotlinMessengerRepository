@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import com.example.kotlinmessenger.R
@@ -14,6 +15,7 @@ import com.example.kotlinmessenger.databinding.ChatToRowBinding
 import com.example.kotlinmessenger.model.ChatMessage
 import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -34,6 +36,10 @@ class ChatLogActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Fresco初期化
+        Fresco.initialize(this)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat_log)
         binding.userPageViewModel = viewModel
         binding.lifecycleOwner = this
@@ -44,6 +50,15 @@ class ChatLogActivity : AppCompatActivity() {
 
         viewModel.listenForMessages(toUser, this)
         recyclerview_chat_log.adapter = viewModel.ChatLogAdapter.value
+        recyclerview_chat_log.setHasFixedSize(true)
+        recyclerview_chat_log.setItemViewCacheSize(20)
+//        recyclerview_chat_log.setDrawingCacheEnabled(true)
+//        recyclerview_chat_log.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH)
+
+        val imagePipeline = Fresco.getImagePipeline()
+        // Clear cache
+        imagePipeline.clearMemoryCaches()
+        imagePipeline.clearDiskCaches()
 
 
         send_button_chat_log.setOnClickListener {
