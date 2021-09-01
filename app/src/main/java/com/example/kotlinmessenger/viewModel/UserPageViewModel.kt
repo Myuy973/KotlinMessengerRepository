@@ -8,7 +8,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
@@ -25,14 +24,12 @@ import com.example.kotlinmessenger.view.ShowActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import okhttp3.Dispatcher
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -620,7 +617,7 @@ class UserPageViewModel : ViewModel() {
         ref.putFile(selectedImageUri!!)
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {
-                        Log.d("log", "image uri: ${it.toString()}")
+                        Log.d("log", "image uri: ${it}")
                         performSendMessage(activity, it.toString())
                     }
                 }
@@ -628,6 +625,9 @@ class UserPageViewModel : ViewModel() {
 
     @SuppressWarnings("unchecked")
     fun changeToShowActivity(imageView: View, imageUri: String, activity: Activity) {
+
+        imageView.visibility = View.VISIBLE
+
         val intent = Intent(activity, ShowActivity::class.java)
         Log.d("log", "imageuri: $imageUri")
         intent.putExtra(IMAGE_SHOW, imageUri)

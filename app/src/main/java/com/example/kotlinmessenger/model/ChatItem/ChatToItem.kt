@@ -10,6 +10,8 @@ import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ChatToRowBinding
 import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.databinding.BindableItem
 
@@ -21,9 +23,13 @@ class ChatToItem(private val imageUri: String, val text: String, val user: User,
             viewBinding.sendImage.visibility = View.GONE
 
             viewBinding.textView.text = text
-            val uri = user.profileImageUri
+            val uri = Uri.parse(user.profileImageUri)
             val userImageView = viewBinding.imageviewChatToRow
-            Picasso.get().load(uri).into(userImageView)
+//            userImageView.setImageURI(uri)
+            Picasso.get().load(uri)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+                .into(userImageView)
         } else {
             if (text == "") {
                 viewBinding.textView.visibility = View.GONE
@@ -35,15 +41,25 @@ class ChatToItem(private val imageUri: String, val text: String, val user: User,
 
             val sendImageUri = Uri.parse(imageUri)
             val sendImageView = viewBinding.sendImage
-            sendImageView.setImageURI(sendImageUri)
+//            sendImageView.setImageURI(sendImageUri)
+            Picasso.get().load(sendImageUri)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+                .into(sendImageView)
+            // スクロールすると画像が消えてしまうバグ解消法
+            sendImageView.visibility = View.VISIBLE
+
             sendImageView.setOnClickListener {
-                UserPageViewModel().changeToShowActivity(sendImageView as View, imageUri, activity)
+                UserPageViewModel().changeToShowActivity(sendImageView, imageUri, activity)
             }
 
-            val uri = user.profileImageUri
+            val uri = Uri.parse(user.profileImageUri)
             val userImageView = viewBinding.imageviewChatToRow
-            userImageView.setImageURI(uri)
-        //            Picasso.get().load(uri).into(userImageView)
+//            userImageView.setImageURI(uri)
+            Picasso.get().load(uri)
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+                .into(userImageView)
         }
     }
 

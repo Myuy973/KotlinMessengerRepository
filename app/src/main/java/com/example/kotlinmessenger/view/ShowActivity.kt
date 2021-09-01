@@ -1,14 +1,16 @@
 package com.example.kotlinmessenger.view
 
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityShowBinding
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show.*
 
@@ -24,8 +26,11 @@ class ShowActivity : AppCompatActivity() {
         val imageUri = intent.getStringExtra(UserPageViewModel().IMAGE_SHOW) ?: ""
         Log.d("log", "show Activity imageuri: $imageUri")
 
-        ViewCompat.setTransitionName(binding.showImagePreview, VIEW_NAME_HEADER_IMAGE)
-        Picasso.get().load(imageUri).into(binding.showImagePreview)
+        ViewCompat.setTransitionName(show_image_preview, VIEW_NAME_HEADER_IMAGE)
+        val uri = Uri.parse(imageUri)
+        Picasso.get().load(uri).into(show_image_preview)
+//        show_image_preview.setImageURI(uri)
+        Log.d("log", "show Activity visibility : ${show_image_preview.visibility}")
 
         show_activity_container.setOnClickListener { onBackPressed() }
 

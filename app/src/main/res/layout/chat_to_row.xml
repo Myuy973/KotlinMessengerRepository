@@ -1,93 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp">
+        android:layout_marginStart="8dp"
+        android:background="@drawable/rounded_chattext_editspace"
+        android:maxWidth="240dp"
+        android:padding="12dp"
+        android:text="hello"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/imageview_chat_to_row"
+        app:layout_constraintTop_toTopOf="@+id/imageview_chat_to_row" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/rounded_chattext_editspace"
-            android:maxWidth="240dp"
-            android:padding="12dp"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"
-            app:layout_constraintTop_toTopOf="@+id/imageview_chat_to_row"
-            tools:text="This is my message kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk" />
-
-<!--        <de.hdodenhof.circleimageview.CircleImageView-->
-<!--            android:id="@+id/imageview_chat_to_row"-->
-<!--            android:layout_width="35dp"-->
-<!--            android:layout_height="35dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            app:civ_border_color="@android:color/black"-->
-<!--            app:civ_border_width="2dp"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            tools:srcCompat="@tools:sample/avatars" />-->
-
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/imageview_chat_to_row"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginEnd="8dp"
-            fresco:roundAsCircle="true"
-            app:civ_border_color="@android:color/black"
-            app:civ_border_width="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars" />
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imageview_chat_to_row"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:civ_border_color="@android:color/black"
+        app:civ_border_width="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@color/black" />
+    <!--        <com.facebook.drawee.view.SimpleDraweeView-->
+    <!--            android:id="@+id/imageview_chat_to_row"-->
+    <!--            android:layout_width="35dp"-->
+    <!--            android:layout_height="35dp"-->
+    <!--            android:layout_marginStart="8dp"-->
+    <!--            android:layout_marginTop="8dp"-->
+    <!--            fresco:roundAsCircle="true"-->
+    <!--            app:civ_border_color="@android:color/black"-->
+    <!--            app:civ_border_width="2dp"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent"-->
+    <!--            app:srcCompat="@color/black" />-->
 
 
+    <!--        <com.facebook.drawee.view.SimpleDraweeView-->
+    <!--            android:id="@+id/send_image"-->
+    <!--            android:layout_width="240dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginStart="8dp"-->
+    <!--            android:adjustViewBounds="true"-->
+    <!--            android:maxHeight="500dp"-->
+    <!--            android:scaleType="centerCrop"-->
+    <!--            app:layout_constraintStart_toEndOf="@+id/imageview_chat_to_row"-->
+    <!--            app:layout_constraintTop_toBottomOf="@+id/textView"-->
+    <!--            tools:src="@tools:sample/avatars" />-->
 
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/send_image"
-            android:layout_width="240dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:adjustViewBounds="true"
-            android:maxHeight="500dp"
-            android:scaleType="centerCrop"
-            app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
-            tools:src="@tools:sample/avatars"
-            tools:srcCompat="@tools:sample/avatars" />
+    <ImageView
+        android:id="@+id/send_image"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:maxHeight="500dp"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        app:layout_constraintStart_toEndOf="@+id/imageview_chat_to_row"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:srcCompat="@tools:sample/avatars" />
 
-<!--        <ImageView-->
-<!--            android:id="@+id/send_image"-->
-<!--            android:layout_width="240dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:scaleType="centerCrop"-->
-<!--            android:adjustViewBounds="true"-->
-<!--            android:maxHeight="500dp"-->
-<!--            app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/textView"-->
-<!--            tools:srcCompat="@tools:sample/avatars" />-->
+    <!--        <EditText-->
+    <!--            android:id="@+id/textView"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginStart="8dp"-->
+    <!--            android:background="@drawable/rounded_edittext_register_login"-->
+    <!--            android:ems="10"-->
+    <!--            android:gravity="start|top"-->
+    <!--            android:inputType="textMultiLine"-->
+    <!--            android:maxWidth="240dp"-->
+    <!--            android:padding="16dp"-->
+    <!--            android:text="this"-->
+    <!--            app:layout_constraintStart_toEndOf="@+id/imageview_chat_to_row"-->
+    <!--            app:layout_constraintTop_toTopOf="@+id/imageview_chat_to_row" />-->
 
-        <!--        <EditText-->
-<!--            android:id="@+id/textView"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:ems="10"-->
-<!--            android:gravity="start|top"-->
-<!--            android:inputType="textMultiLine"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:background="@drawable/rounded_edittext_register_login"-->
-<!--            android:maxWidth="240dp"-->
-<!--            android:padding="16dp"-->
-<!--            android:text="This is my message kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"-->
-<!--            app:layout_constraintEnd_toStartOf="@+id/imageview_chat_to_row"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/imageview_chat_to_row" />-->
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

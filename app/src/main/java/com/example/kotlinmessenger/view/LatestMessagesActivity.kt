@@ -112,11 +112,5 @@ class LatestMessagesActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-//    fun getBackgroundColor(): List<Int> {
-////        Log.d("log", "resources: ${ ?: "null"}")
-//        val from_color = getColor( R.color.latest_message_card_before_color)
-//        val to_color = getColor(R.color.latest_message_card_after_color)
-//        return listOf(from_color, to_color)
-//    }
 
 }
