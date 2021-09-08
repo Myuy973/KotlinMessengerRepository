@@ -34,11 +34,15 @@ class ShowProfileActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
+        // editUserNameText, editUserEmailText, editUserPassText チェッカー起動
+        viewModel.setUpchecker()
+
+        // ユーザー情報をLiveDataへ
+        viewModel.userInfoDisplay()
 
         val currentUserData = UserPageViewModel.currentUser
+        Picasso.get().load(viewModel.editImageUri.value).into(profile_user_imageview)
 
-        // profile imageview
-        Picasso.get().load(currentUserData.profileImageUri).into(binding.profileUserImageview)
         // profile image change
         image_change_icon.setOnClickListener { profileImageSelect() }
 
@@ -56,11 +60,6 @@ class ShowProfileActivity : AppCompatActivity() {
             }
         }
 
-        // editUserNameText, editUserEmailText, editUserPassText チェッカー起動
-        viewModel.setUpchecker()
-
-        // ユーザー情報をLiveDataへ
-        viewModel.userInfoDisplay()
 
         updataToProfileButton.setOnClickListener { viewModel.userProfileUpdate(this) }
 
@@ -76,6 +75,9 @@ class ShowProfileActivity : AppCompatActivity() {
 
         update_progressBar.setOnTouchListener { _, _ -> true }
 
+    }
+
+    fun userImageSet(uri: String) {
     }
 
     private fun profileImageSelect() {

@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
@@ -21,12 +22,15 @@ import com.example.kotlinmessenger.model.UserItem
 import com.example.kotlinmessenger.view.ChatLogActivity
 import com.example.kotlinmessenger.view.RegisterActivity
 import com.example.kotlinmessenger.view.ShowActivity
+import com.example.kotlinmessenger.view.ShowProfileActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieAdapter
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -47,6 +51,7 @@ class UserPageViewModel : ViewModel() {
     var updateProfileErrorList = mutableListOf<String>()
     lateinit var currentUserCopy: User
     lateinit var profileImageUri: Uri
+    val editImageUri = MutableLiveData<String>("")
     val bitmap = MutableLiveData<Bitmap?>(null)
     val imageUpdateProcess = MutableLiveData<String>("")
     val editUserNameText = MutableLiveData<String>("")
@@ -186,7 +191,10 @@ class UserPageViewModel : ViewModel() {
 
     // ------------------------------ showProfileActivity ------------------------------------------------------------
 
-    fun userInfoDisplay(userName: String = currentUser.userName, userEmail: String = currentUser.userEmail) {
+    fun userInfoDisplay( userImage: String = currentUser.profileImageUri,
+                         userName: String = currentUser.userName,
+                         userEmail: String = currentUser.userEmail) {
+        editImageUri.value = userImage
         editUserNameText.value = userName
         editUserEmailText.value = userEmail
         editUserPassText.value = ""
@@ -258,6 +266,7 @@ class UserPageViewModel : ViewModel() {
                     .addOnSuccessListener {
                         ref.downloadUrl.addOnSuccessListener {
                             currentUserCopy.profileImageUri = it.toString()
+                            editImageUri.value = it.toString()
                             imageUpdateProcess.value = "ok"
                         }
                     }
@@ -265,7 +274,7 @@ class UserPageViewModel : ViewModel() {
                         imageUpdateProcess.value = "error"
                         updateProfileErrorList.add(errorSetter(it.message!!))
                     }
-        }
+        } else { imageUpdateProcess.value = "ok"}
 
         // userName
         if (editUserNameText.value != currentUser.userName) {
@@ -278,8 +287,10 @@ class UserPageViewModel : ViewModel() {
             Log.d("log", "email change: ${editUserEmailText.value}")
             currentUserAuth?.updateEmail(editUserEmailText.value!!)
                     ?.addOnSuccessListener {
-                        Log.d("log", "email change success: ${Thread.currentThread().name}")
+                        Log.d("log", "editUserEmailText value: ${editUserEmailText.value!!}")
+                        Log.d("log", "email before value: ${currentUserCopy.userEmail}")
                         currentUserCopy.userEmail = editUserEmailText.value!!
+                        Log.d("log", "email after value: ${currentUserCopy.userEmail}")
                         emailUpdateProcess.value = "ok"
                     }
                     ?.addOnFailureListener {
@@ -311,11 +322,12 @@ class UserPageViewModel : ViewModel() {
     suspend fun userdataUpdate(activity: Activity) {
 
         Log.d("log", "userdataUpdate start")
-        Log.d("log", "emailUpdateProcess: ${emailUpdateProcess.value}, passUpdateProcess: ${passUpdateProcess.value} ")
+        Log.d("log", "imageUpdateProcess: ${imageUpdateProcess.value}, emailUpdateProcess: ${emailUpdateProcess.value}, passUpdateProcess: ${passUpdateProcess.value}, updateAccessLimiter: ${updateAccessLimiter},  ")
         if (imageUpdateProcess.value == "" || emailUpdateProcess.value == "" || passUpdateProcess.value == "" || updateAccessLimiter) {
             Log.d("log", "userdataUpdate cancel")
             return
         }
+        Log.d("log", "userdataUpdate check ok")
 
         updateAccessLimiter = true
 
@@ -323,7 +335,7 @@ class UserPageViewModel : ViewModel() {
 
         // currentUserCopyのデータに変化があれば更新
         Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
-        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
+//        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
         if (currentUser != currentUserCopy) {
             Log.d("log", "user change")
             ref.updateChildren(mapOf(currentUser.uid to currentUserCopy))
@@ -344,8 +356,13 @@ class UserPageViewModel : ViewModel() {
                 printToast(errorMessage, activity)
             } else {
                 rogressbarType.value = View.GONE
+                bitmap.value = null
+                imageUpdateProcess.value = ""
+                emailUpdateProcess.value = ""
+                passUpdateProcess.value = ""
+                updateAccessLimiter = false
                 fetchCurrentUser()
-                userInfoDisplay(currentUserCopy.userName, currentUserCopy.userEmail)
+                userInfoDisplay(currentUserCopy.profileImageUri, currentUserCopy.userName, currentUserCopy.userEmail)
                 printToast("更新完了", activity)
             }
         }
@@ -366,20 +383,29 @@ class UserPageViewModel : ViewModel() {
     fun fetchUserFriends(activity: Activity) {
         friendList = arrayOf()
         val ref = FirebaseDatabase.getInstance().getReference("/user-friends/${currentUser.uid}")
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 NewMessageAdapter.value?.clear()
                 snapshot.children.forEach {
-//                    Log.d("log", "current user: ${currentUser.uid}")
+                    //                    Log.d("log", "current user: ${currentUser.uid}")
 //                    Log.d("log", "user: ${it.getValue(User::class.java)?.userName}")
-                    val user = it.getValue(User::class.java)
-                    Log.d("log", "${user?.uid != currentUser.uid}, ${user?.uid}, ${currentUser.uid}")
-                    if (user != null && user.uid != currentUser.uid) {
-                        NewMessageAdapter.value?.add(UserItem(user))
-                        friendList += user
-                        Log.d("log", "add user: ${user.userName}")
-                        Log.d("log", "friendlist: ${friendList.map { it.userName }}")
+                    class FriendUserUid(val uid: String = "")
+//                    val userUid = it.getValue(FriendUserUid::class.java)?.uid
+                    Log.d("log", "friend : ${it.value}")
+                    val userUid = it.value as Map<*, *>
+                    Log.d("log", "friend : $userUid")
+                    if (userUid["uid"] != currentUser.uid) {
+
+                        val friendUserRef = FirebaseDatabase.getInstance().getReference("/users/${userUid["uid"]}")
+                        friendUserRef.get().addOnSuccessListener { data ->
+                            val friendUser = data.getValue(User::class.java)!!
+                            friendList += friendUser
+                            NewMessageAdapter.value?.add(UserItem(friendUser))
+                            Log.d("log", "add friendUser: ${friendUser.userName}")
+                            Log.d("log", "friendlist: ${friendList.map { it.userName }}")
+                        }
+
                     }
                 }
 
@@ -402,44 +428,44 @@ class UserPageViewModel : ViewModel() {
         })
     }
 
-    fun addFriendFunction(uid: String, activity: Activity) {
+    fun addFriendFunction(friendUid: String, activity: Activity) {
         Log.d("log", "start addFriendFunction")
 
-        if (currentUser.uid == uid) {
+        if (currentUser.uid == friendUid) {
             printToast("自分を追加することはできません", activity)
             return
-        } else if (uid.isEmpty()) {
+        } else if (friendUid.isEmpty()) {
             printToast("ユーザーのIDを入力してください", activity)
             return
         }
 
-        val searchUserRef = FirebaseDatabase.getInstance().getReference("users/$uid")
-        searchUserRef.get()
-                .addOnSuccessListener {
-                    val friendData = it.getValue(User::class.java)
+        val friendUserRef =
+                FirebaseDatabase.getInstance().getReference("users/$friendUid")
+        val myFriendRef =
+                FirebaseDatabase.getInstance().getReference("user-friends/${currentUser.uid}/${friendUid}")
+        val yourFriendRef =
+                FirebaseDatabase.getInstance().getReference("user-friends/${friendUid}/${currentUser.uid}")
 
-                    val myFriendRef =
-                            FirebaseDatabase.getInstance().getReference("user-friends/${currentUser.uid}/${friendData?.uid}")
-                    val yourFriendRef =
-                            FirebaseDatabase.getInstance().getReference("user-friends/${friendData?.uid}/${currentUser.uid}")
-                    try {
-                        myFriendRef.setValue(friendData)
-                        yourFriendRef.setValue(currentUser)
+        friendUserRef.get().addOnSuccessListener {
 
-                        fetchUserFriends(activity)
+            try {
+                myFriendRef.setValue(mapOf("uid" to friendUid))
+                yourFriendRef.setValue(mapOf("uid" to currentUser.uid))
 
-                        printToast("${it.getValue(User::class.java)?.userName}さんを追加しました！", activity)
+                fetchUserFriends(activity)
 
-                    } catch (e: java.lang.Exception) {
-                        printToast("ユーザー追加に失敗しました", activity)
-                        Log.d("log", "add friend error: ${e.printStackTrace()}")
-                    }
+                printToast("${it.getValue(User::class.java)?.userName}さんを追加しました！", activity)
 
+            } catch (e: java.lang.Exception) {
+                printToast("ユーザー追加に失敗しました", activity)
+                Log.d("log", "add friend error: ${e.printStackTrace()}")
+            }
 
-                }
-                .addOnFailureListener {
-                    printToast("ユーザーが見つかりません", activity)
-                }
+        }.addOnFailureListener {
+                printToast("ユーザー追加に失敗しました", activity)
+                Log.d("log", "add friend error: ${it.printStackTrace()}")
+        }
+
 
     }
 
@@ -457,12 +483,11 @@ class UserPageViewModel : ViewModel() {
 
         try {
             deleteUserData.forEach { deleteUser ->
-                val removeMyFriendRef = FirebaseDatabase
-                    .getInstance()
-                    .getReference("user-friends/${currentUser.uid}/${deleteUser.uid}")
-                val removeYourFriendRef = FirebaseDatabase
-                    .getInstance()
-                    .getReference("user-friends/${deleteUser.uid}/${currentUser.uid}")
+                val removeMyFriendRef =
+                        FirebaseDatabase.getInstance().getReference("user-friends/${currentUser.uid}/${deleteUser.uid}")
+                val removeYourFriendRef =
+                        FirebaseDatabase.getInstance().getReference("user-friends/${deleteUser.uid}/${currentUser.uid}")
+
                 removeMyFriendRef.removeValue()
                 removeYourFriendRef.removeValue()
             }
@@ -471,8 +496,6 @@ class UserPageViewModel : ViewModel() {
         } catch (e: java.lang.Exception) {
             printToast("削除に失敗しました。", activity)
         }
-
-
 
     }
 
