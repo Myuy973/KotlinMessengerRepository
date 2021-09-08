@@ -191,9 +191,9 @@ class UserPageViewModel : ViewModel() {
 
     // ------------------------------ showProfileActivity ------------------------------------------------------------
 
-    fun userInfoDisplay( userImage: String = currentUser.profileImageUri,
-                         userName: String = currentUser.userName,
-                         userEmail: String = currentUser.userEmail) {
+    fun userInfoDisplay(userImage: String = currentUser.profileImageUri,
+                        userName: String = currentUser.userName,
+                        userEmail: String = currentUser.userEmail) {
         editImageUri.value = userImage
         editUserNameText.value = userName
         editUserEmailText.value = userEmail
@@ -222,7 +222,12 @@ class UserPageViewModel : ViewModel() {
                 editUserPassText.value?.isNotEmpty()!!
     }
 
-    fun userProfileUpdate(activity: Activity) {
+    fun userProfileUpdate(activity: Activity, loginType: Boolean) {
+
+        if (loginType) {
+            printToast("SNSログインの場合は編集できません", activity)
+            return
+        }
 
         updateAccessLimiter = false
         rogressbarType.value = View.VISIBLE

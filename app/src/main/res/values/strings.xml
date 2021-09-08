@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KotlinMessenger</string>
+    <string name="app_name">SimpleMessenger</string>
     <string name="name_edittext_hint">UserName(25文字以下)</string>
     <string name="email_edittext_hint">Email</string>
     <string name="pass_edittext_hint">英数字8文字以上</string>

@@ -189,7 +189,8 @@ class LoginViewModel: ViewModel() {
     private fun saveUserToFirebaseDatabase(activity: Activity,
                                            profileImageUri: String,
                                            userName: String,
-                                           userEmail: String) {
+                                           userEmail: String,
+                                           snsLogin: Boolean) {
 
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = Firebase.database.getReference("users/$uid")
@@ -198,9 +199,11 @@ class LoginViewModel: ViewModel() {
 
         ref.setValue(user).addOnSuccessListener {
             toastPrint("ようこそ ${user.userName}さん", activity)
-            Log.d("log", "Finally we saved the user to Firebase Database")
+//            Log.d("log", "Finally we saved the user to Firebase Database")
+            Log.d("log", "snsLogin: $snsLogin")
             val intent = Intent(activity, LatestMessagesActivity::class.java)
             intent.putExtra("fromActivity", "SigninOrLogin")
+            intent.putExtra("snsLogin", snsLogin)
             // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             activity.startActivity(intent)
@@ -330,7 +333,7 @@ class LoginViewModel: ViewModel() {
             .addOnSuccessListener {
                 Log.d("log", "successfully uploaded image")
                 ref.downloadUrl.addOnSuccessListener {
-                    saveUserToFirebaseDatabase(activity, it.toString(), userName.value!!, userEmail)
+                    saveUserToFirebaseDatabase(activity, it.toString(), userName.value!!, userEmail, false)
                 }
             }
             .addOnFailureListener { e ->
@@ -362,7 +365,6 @@ class LoginViewModel: ViewModel() {
             toastPrint("onActivityResult error: ${e.printStackTrace()}", activity)
             Log.d("log", "onActivityResult error: ${e.message}")
         }
-
     }
 
     private fun firebaseAuthWithGoogle(idToken: String, activity: Activity) {
@@ -374,7 +376,7 @@ class LoginViewModel: ViewModel() {
                         val email = auth.currentUser?.email
                         val photourl = auth.currentUser?.photoUrl
                         Log.d("log", "google signin success : name: $name, email: $email, photourl: $photourl")
-                        saveUserToFirebaseDatabase(activity, photourl!!.toString(), name!!, email!!)
+                        saveUserToFirebaseDatabase(activity, photourl!!.toString(), name!!, email!!, true)
                     } else {
                         toastPrint("firebaseAuthWithGoogle error: ${task.exception}", activity)
                         Log.d("log", "firebaseAuthWithGoogle error: ${task.exception}")
@@ -392,12 +394,11 @@ class LoginViewModel: ViewModel() {
                 val userName = it.user?.displayName!!
                 val userEmail = it.user?.email ?: ""
                 val userPhotoUri = it.user?.photoUrl.toString()
-                saveUserToFirebaseDatabase(activity, userPhotoUri, userName, userEmail)
-                toastPrint("ログイン完了", activity)
+                saveUserToFirebaseDatabase(activity, userPhotoUri, userName, userEmail, true)
             }
             .addOnFailureListener {
                 toastPrint("ログイン失敗: ${it.message}", activity)
-                Log.d("log", "")
+                Log.d("log", "${it.message}")
             }
     }
 

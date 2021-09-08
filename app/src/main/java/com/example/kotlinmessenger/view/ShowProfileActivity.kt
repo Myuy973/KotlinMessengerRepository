@@ -61,7 +61,8 @@ class ShowProfileActivity : AppCompatActivity() {
         }
 
 
-        updataToProfileButton.setOnClickListener { viewModel.userProfileUpdate(this) }
+        val snsLogin = intent.getBooleanExtra("snsLogin", false)
+        updataToProfileButton.setOnClickListener { viewModel.userProfileUpdate(this, snsLogin) }
 
         // email, pass, imageそれぞれの更新処理が終わっているかチェック
         listOf( viewModel.emailUpdateProcess,
@@ -77,8 +78,6 @@ class ShowProfileActivity : AppCompatActivity() {
 
     }
 
-    fun userImageSet(uri: String) {
-    }
 
     private fun profileImageSelect() {
         val intent = Intent(Intent.ACTION_PICK)

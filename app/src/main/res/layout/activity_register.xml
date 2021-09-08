@@ -89,6 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="すでにアカウントをお持ちの方"
+            android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/register_button_register"
             app:layout_constraintStart_toStartOf="@+id/register_button_register"
@@ -125,6 +126,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="32dp"
+            android:elevation="5dp"
             app:layout_constraintEnd_toStartOf="@+id/twitter_signin_button"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -136,6 +138,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/white"
+            android:elevation="5dp"
             android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="@+id/google_signin_button"
             app:layout_constraintEnd_toEndOf="parent"
@@ -148,24 +151,15 @@
             android:id="@+id/signin_progressBar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#BF686666"
             android:elevation="20dp"
             android:visibility="@{loginviewModel.progressbarType}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <View
-                android:id="@+id/view2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#BF686666"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone">
 
             <ProgressBar
                 android:id="@+id/progressBar"

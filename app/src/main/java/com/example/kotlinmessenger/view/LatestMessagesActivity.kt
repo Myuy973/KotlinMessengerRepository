@@ -36,6 +36,7 @@ class LatestMessagesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLatestMessagesBinding
     private lateinit var latestMessageResource: Resources
+    private var snsLogin: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +56,7 @@ class LatestMessagesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        snsLogin = intent.getBooleanExtra("snsLogin", false)
         val fromActivity = intent.getStringExtra("fromActivity")
 
         Log.d("log", "fromActivity: $fromActivity")
@@ -90,6 +92,7 @@ class LatestMessagesActivity : AppCompatActivity() {
             }
             R.id.user_profile -> {
                 val intent = Intent(this, ShowProfileActivity::class.java)
+                intent.putExtra("snsLogin", snsLogin)
                 startActivity(intent)
             }
             R.id.menu_sign_out -> {
