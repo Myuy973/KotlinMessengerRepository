@@ -123,29 +123,16 @@
 
         <ImageView
             android:id="@+id/google_signin_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_marginTop="32dp"
+            android:background="@drawable/rounded_google_login"
             android:elevation="5dp"
-            app:layout_constraintEnd_toStartOf="@+id/twitter_signin_button"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
+            android:padding="7dp"
+            app:layout_constraintEnd_toEndOf="@+id/register_button_register"
+            app:layout_constraintStart_toStartOf="@+id/register_button_register"
             app:layout_constraintTop_toBottomOf="@+id/already_have_an_account_textView"
-            app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
-
-        <ImageView
-            android:id="@+id/twitter_signin_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@color/white"
-            android:elevation="5dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="@+id/google_signin_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/google_signin_button"
-            app:layout_constraintTop_toTopOf="@+id/google_signin_button"
-            app:srcCompat="@drawable/ic_iconmonstr_twitter_2" />
+            app:srcCompat="@drawable/google" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/signin_progressBar"

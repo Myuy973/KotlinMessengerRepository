@@ -384,23 +384,5 @@ class LoginViewModel: ViewModel() {
                 }
     }
 
-    // --------------------------- twitter login --------------------------------------------------------
-
-
-    fun twitterSignin(activity: Activity) {
-        FirebaseAuth.getInstance().startActivityForSignInWithProvider(activity, provider.build())
-            .addOnSuccessListener {
-                Log.d("log", "name: ${it.user?.displayName}, email: ${it.user?.email}, id: ${it.user?.providerId}, image_url: ${it.user?.photoUrl}")
-                val userName = it.user?.displayName!!
-                val userEmail = it.user?.email ?: ""
-                val userPhotoUri = it.user?.photoUrl.toString()
-                saveUserToFirebaseDatabase(activity, userPhotoUri, userName, userEmail, true)
-            }
-            .addOnFailureListener {
-                toastPrint("ログイン失敗: ${it.message}", activity)
-                Log.d("log", "${it.message}")
-            }
-    }
-
 
 }

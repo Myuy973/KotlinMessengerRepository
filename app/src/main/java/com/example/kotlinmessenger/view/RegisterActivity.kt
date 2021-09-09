@@ -64,9 +64,6 @@ class RegisterActivity : AppCompatActivity() {
         google_signin_button.setOnClickListener {
             viewModel.googleSignin(this)
         }
-        twitter_signin_button.setOnClickListener {
-            viewModel.twitterSignin(this)
-        }
 
         signin_progressBar.setOnTouchListener { _, _ -> true }
 
