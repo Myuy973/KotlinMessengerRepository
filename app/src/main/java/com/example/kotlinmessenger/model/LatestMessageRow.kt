@@ -31,14 +31,14 @@ data class LatestMessageRow(val chatMessage: ChatMessage, val childChangeType: S
             chatMessage.fromId
         }
 
-        Log.d("listenForLatestMessages", "chatPartnerId: $chatPartnerId")
+//        Log.d("listenForLatestMessages", "chatPartnerId: $chatPartnerId")
 
         // chatPartnerIdからユーザー情報取得・表示
         FirebaseDatabase.getInstance().getReference("users/$chatPartnerId")
             .addListenerForSingleValueEvent( object: ValueEventListener {
 
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d("listenForLatestMessages", "users")
+//                    Log.d("listenForLatestMessages", "users")
                     chatPartnerUser = snapshot.getValue(User::class.java)!!
                     viewBinding.usernameTextviewLatestMessager.text = chatPartnerUser?.userName
 

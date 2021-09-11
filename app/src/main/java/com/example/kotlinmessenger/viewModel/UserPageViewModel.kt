@@ -111,9 +111,9 @@ class UserPageViewModel : ViewModel() {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         try {
                             currentUser = snapshot.getValue(User::class.java)!!
-                            Log.d("log", "Login user: ${currentUser.userName}")
+//                            Log.d("log", "Login user: ${currentUser.userName}")
                         } catch (e: Exception) {
-                            Log.d("log", "login user error: $e")
+//                            Log.d("log", "login user error: $e")
                         }
                     }
 
@@ -131,7 +131,7 @@ class UserPageViewModel : ViewModel() {
             try {
                 LatestMessagesAdapter.value?.update(LatestOldList)
             } catch (e: java.lang.Exception) {
-                Log.d("log", "error: ${e.message}")
+//                Log.d("log", "error: ${e.message}")
             }
 
         } else if (addOrChangeType == "Change") {
@@ -140,7 +140,7 @@ class UserPageViewModel : ViewModel() {
             try {
                 LatestMessagesAdapter.value?.update(LatestOldList)
             } catch (e: java.lang.Exception) {
-                Log.d("log", "error: ${e.message}")
+//                Log.d("log", "error: ${e.message}")
             }
         }
     }
@@ -155,12 +155,12 @@ class UserPageViewModel : ViewModel() {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
 
-                Log.d("listenForLatestMessages", "database add changed!!! : ${chatMessage.text}")
-                Log.d("listenForLatestMessages", "snapshot changed!!! : ${snapshot}")
+//                Log.d("listenForLatestMessages", "database add changed!!! : ${chatMessage.text}")
+//                Log.d("listenForLatestMessages", "snapshot changed!!! : ${snapshot}")
 
                 latestMessageMap[snapshot.key!!] = chatMessage
 
-                Log.d("listenForLatestMessages", "latestMessageMap: ${latestMessageMap[snapshot.key]}, id: ${snapshot.key}")
+//                Log.d("listenForLatestMessages", "latestMessageMap: ${latestMessageMap[snapshot.key]}, id: ${snapshot.key}")
 
                 refreshRecyclerViewMessages("Add")
             }
@@ -168,7 +168,7 @@ class UserPageViewModel : ViewModel() {
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
 
-                Log.d("listenForLatestMessages", "database onChildChanged!!!: ${chatMessage.text}")
+//                Log.d("listenForLatestMessages", "database onChildChanged!!!: ${chatMessage.text}")
 
                 latestMessageMap[snapshot.key!!] = chatMessage
                 var latestChangePosition = 0
@@ -198,8 +198,8 @@ class UserPageViewModel : ViewModel() {
         editUserNameText.value = userName
         editUserEmailText.value = userEmail
         editUserPassText.value = ""
-        Log.d("log", "currentuser: ${currentUser.userName}, ${currentUser.userEmail}")
-        Log.d("log", "edittext: ${editUserNameText.value}, ${editUserEmailText.value}")
+//        Log.d("log", "currentuser: ${currentUser.userName}, ${currentUser.userEmail}")
+//        Log.d("log", "edittext: ${editUserNameText.value}, ${editUserEmailText.value}")
     }
 
     fun setUpchecker() {
@@ -232,7 +232,7 @@ class UserPageViewModel : ViewModel() {
         updateAccessLimiter = false
         rogressbarType.value = View.VISIBLE
 
-        Log.d("log", "input Text: ${editUserNameText.value}, ${editUserEmailText.value}, ${editUserPassText.value}")
+//        Log.d("log", "input Text: ${editUserNameText.value}, ${editUserEmailText.value}, ${editUserPassText.value}")
         updateProfileErrorList = mutableListOf()
 
         // 入力されたデータのチェック
@@ -260,8 +260,8 @@ class UserPageViewModel : ViewModel() {
         val currentUserAuth = FirebaseAuth.getInstance().currentUser
         currentUserCopy = currentUser.copy()
 
-        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
-        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
+//        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
+//        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
 
         // user image
         if (bitmap.value != null) {
@@ -283,40 +283,40 @@ class UserPageViewModel : ViewModel() {
 
         // userName
         if (editUserNameText.value != currentUser.userName) {
-            Log.d("log", "name change")
+//            Log.d("log", "name change")
             currentUserCopy.userName = editUserNameText.value!!
         }
 
         // userEmail
         if (editUserEmailText.value != currentUser.userEmail) {
-            Log.d("log", "email change: ${editUserEmailText.value}")
+//            Log.d("log", "email change: ${editUserEmailText.value}")
             currentUserAuth?.updateEmail(editUserEmailText.value!!)
                     ?.addOnSuccessListener {
-                        Log.d("log", "editUserEmailText value: ${editUserEmailText.value!!}")
-                        Log.d("log", "email before value: ${currentUserCopy.userEmail}")
+//                        Log.d("log", "editUserEmailText value: ${editUserEmailText.value!!}")
+//                        Log.d("log", "email before value: ${currentUserCopy.userEmail}")
                         currentUserCopy.userEmail = editUserEmailText.value!!
-                        Log.d("log", "email after value: ${currentUserCopy.userEmail}")
+//                        Log.d("log", "email after value: ${currentUserCopy.userEmail}")
                         emailUpdateProcess.value = "ok"
                     }
                     ?.addOnFailureListener {
                         emailUpdateProcess.value = "error"
                         updateProfileErrorList.add(errorSetter(it.message!!))
-                        Log.d("log", "email error : ${it.message}")
+//                        Log.d("log", "email error : ${it.message}")
                     }
         } else { emailUpdateProcess.value = "ok" }
 
         // userPass
         if (editUserPassText.value != "") {
-            Log.d("log", "pass change: ${editUserPassText.value}")
+//            Log.d("log", "pass change: ${editUserPassText.value}")
             currentUserAuth?.updatePassword(editUserPassText.value!!)
                     ?.addOnSuccessListener {
                         passUpdateProcess.value = "ok"
                     }
                     ?.addOnFailureListener {
-                        Log.d("log", "pass change failed: ${Thread.currentThread().name}")
+//                        Log.d("log", "pass change failed: ${Thread.currentThread().name}")
                         passUpdateProcess.value = "error"
                         updateProfileErrorList.add(errorSetter(it.message!!))
-                        Log.d("log", "pass error : ${it.message}")
+//                        Log.d("log", "pass error : ${it.message}")
                     }
         } else { passUpdateProcess.value = "ok" }
 
@@ -326,30 +326,30 @@ class UserPageViewModel : ViewModel() {
     // 更新処理
     suspend fun userdataUpdate(activity: Activity) {
 
-        Log.d("log", "userdataUpdate start")
-        Log.d("log", "imageUpdateProcess: ${imageUpdateProcess.value}, emailUpdateProcess: ${emailUpdateProcess.value}, passUpdateProcess: ${passUpdateProcess.value}, updateAccessLimiter: ${updateAccessLimiter},  ")
+//        Log.d("log", "userdataUpdate start")
+//        Log.d("log", "imageUpdateProcess: ${imageUpdateProcess.value}, emailUpdateProcess: ${emailUpdateProcess.value}, passUpdateProcess: ${passUpdateProcess.value}, updateAccessLimiter: ${updateAccessLimiter},  ")
         if (imageUpdateProcess.value == "" || emailUpdateProcess.value == "" || passUpdateProcess.value == "" || updateAccessLimiter) {
-            Log.d("log", "userdataUpdate cancel")
+//            Log.d("log", "userdataUpdate cancel")
             return
         }
-        Log.d("log", "userdataUpdate check ok")
+//        Log.d("log", "userdataUpdate check ok")
 
         updateAccessLimiter = true
 
         val ref = FirebaseDatabase.getInstance().getReference("users")
 
         // currentUserCopyのデータに変化があれば更新
-        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
-//        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
+//        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
+////        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
         if (currentUser != currentUserCopy) {
-            Log.d("log", "user change")
+//            Log.d("log", "user change")
             ref.updateChildren(mapOf(currentUser.uid to currentUserCopy))
                     .addOnSuccessListener {
-                        Log.d("log", "user change success")
+//                        Log.d("log", "user change success")
                     }
         }
 
-        Log.d("log", "errorlist ${updateProfileErrorList}")
+//        Log.d("log", "errorlist ${updateProfileErrorList}")
         withContext(Dispatchers.Main) {
             if (updateProfileErrorList.isNotEmpty()) {
                 rogressbarType.value = View.GONE
@@ -393,13 +393,13 @@ class UserPageViewModel : ViewModel() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 NewMessageAdapter.value?.clear()
                 snapshot.children.forEach {
-                    //                    Log.d("log", "current user: ${currentUser.uid}")
-//                    Log.d("log", "user: ${it.getValue(User::class.java)?.userName}")
+//                    //                    Log.d("log", "current user: ${currentUser.uid}")
+////                    Log.d("log", "user: ${it.getValue(User::class.java)?.userName}")
                     class FriendUserUid(val uid: String = "")
 //                    val userUid = it.getValue(FriendUserUid::class.java)?.uid
-                    Log.d("log", "friend : ${it.value}")
+//                    Log.d("log", "friend : ${it.value}")
                     val userUid = it.value as Map<*, *>
-                    Log.d("log", "friend : $userUid")
+//                    Log.d("log", "friend : $userUid")
                     if (userUid["uid"] != currentUser.uid) {
 
                         val friendUserRef = FirebaseDatabase.getInstance().getReference("/users/${userUid["uid"]}")
@@ -407,8 +407,8 @@ class UserPageViewModel : ViewModel() {
                             val friendUser = data.getValue(User::class.java)!!
                             friendList += friendUser
                             NewMessageAdapter.value?.add(UserItem(friendUser))
-                            Log.d("log", "add friendUser: ${friendUser.userName}")
-                            Log.d("log", "friendlist: ${friendList.map { it.userName }}")
+//                            Log.d("log", "add friendUser: ${friendUser.userName}")
+//                            Log.d("log", "friendlist: ${friendList.map { it.userName }}")
                         }
 
                     }
@@ -434,7 +434,7 @@ class UserPageViewModel : ViewModel() {
     }
 
     fun addFriendFunction(friendUid: String, activity: Activity) {
-        Log.d("log", "start addFriendFunction")
+//        Log.d("log", "start addFriendFunction")
 
         if (currentUser.uid == friendUid) {
             printToast("自分を追加することはできません", activity)
@@ -463,12 +463,12 @@ class UserPageViewModel : ViewModel() {
 
             } catch (e: java.lang.Exception) {
                 printToast("ユーザー追加に失敗しました", activity)
-                Log.d("log", "add friend error: ${e.printStackTrace()}")
+//                Log.d("log", "add friend error: ${e.printStackTrace()}")
             }
 
         }.addOnFailureListener {
                 printToast("ユーザー追加に失敗しました", activity)
-                Log.d("log", "add friend error: ${it.printStackTrace()}")
+//                Log.d("log", "add friend error: ${it.printStackTrace()}")
         }
 
 
@@ -520,17 +520,17 @@ class UserPageViewModel : ViewModel() {
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-                Log.d("log", "add start")
+//                Log.d("log", "add start")
                 val chatMessage = snapshot.getValue(ChatMessage::class.java)
 
 
                 // alreadyReadへの既読処理
                 if (!chatMessage?.alreadyRead!!) {
-                    Log.d("log", snapshot.key!!)
+//                    Log.d("log", snapshot.key!!)
                     chatMessage.alreadyRead = true
                 }
 
-                Log.d("log", chatMessage.text)
+//                Log.d("log", chatMessage.text)
                 if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
                     val currentUser = currentUser
                     ChatLogAdapter.value?.add(
@@ -542,8 +542,8 @@ class UserPageViewModel : ViewModel() {
                     )
                 }
 
-                Log.d("log", "fromId: $fromId")
-                Log.d("log", "toUserId: ${toUser?.uid}")
+//                Log.d("log", "fromId: $fromId")
+//                Log.d("log", "toUserId: ${toUser?.uid}")
 
                 // 既読したメッセージをデータベースへ保存
                 ref.updateChildren(mapOf(snapshot.key!! to chatMessage))
@@ -571,9 +571,9 @@ class UserPageViewModel : ViewModel() {
             .getReference("user-messages/$fromId/${toUser?.uid}")
         try {
             ref.removeEventListener(childEventListener)
-            Log.d("log", "finish success!!")
+//            Log.d("log", "finish success!!")
         } catch (e: java.lang.Exception) {
-            Log.d("log", "error: ${e.message}")
+//            Log.d("log", "error: ${e.message}")
         }
     }
 
@@ -582,8 +582,8 @@ class UserPageViewModel : ViewModel() {
 
         val notEmptyPattern = Regex(""".+""")
         val omitToSpace = chatInputText.value!!.filter { !Regex("""\s""").matches(it.toString()) }
-        Log.d("log", "subText: [${omitToSpace}]")
-        Log.d("log", "${!notEmptyPattern.matches(omitToSpace)}, ${omitToSpace.isEmpty()}, ${!imageSelectedType}")
+//        Log.d("log", "subText: [${omitToSpace}]")
+//        Log.d("log", "${!notEmptyPattern.matches(omitToSpace)}, ${omitToSpace.isEmpty()}, ${!imageSelectedType}")
         if ((!notEmptyPattern.matches(omitToSpace) || omitToSpace.isEmpty()) && !imageSelectedType) {
             printToast("テキストを入力してください", activity)
             return
@@ -595,28 +595,28 @@ class UserPageViewModel : ViewModel() {
 
         val reference = FirebaseDatabase.getInstance().getReference("user-messages/$fromId/$toId").push()
         val toReference = FirebaseDatabase.getInstance().getReference("user-messages/$toId/$fromId").push()
-        Log.d("log", "parameter set ok")
+//        Log.d("log", "parameter set ok")
 
-        Log.d("log", "${reference.key!!}, ${chatInputText.value!!}, ${fromId}, ${toId}, ${System.currentTimeMillis() / 1000}")
+//        Log.d("log", "${reference.key!!}, ${chatInputText.value!!}, ${fromId}, ${toId}, ${System.currentTimeMillis() / 1000}")
         // クラスにして送らないと送信できない(Activityも落ちる)
         val chatMessage = ChatMessage(reference.key!!, chatInputText.value!!, imageUri, fromId, toId, System.currentTimeMillis() / 1000, false)
         reference.setValue(chatMessage)
                 .addOnSuccessListener {
-                    Log.d("log", "Saved our chat message to From: ${it}")
-                    Log.d("log", "inputText: [${chatInputText.value}]")
-                    Log.d("log", "inputText length: [${chatInputText.value!!.length}]")
+//                    Log.d("log", "Saved our chat message to From: ${it}")
+//                    Log.d("log", "inputText: [${chatInputText.value}]")
+//                    Log.d("log", "inputText length: [${chatInputText.value!!.length}]")
                     chatInputText.value = ""
-//                Log.d("log", "inputText: ${chatInputText.value}")
+////                Log.d("log", "inputText: ${chatInputText.value}")
 //                    recyclerview_chat_log.scrollToPosition(ChatLogAdapter.value?.itemCount!! - 1)
                     try {
                         scrollPosition.value = ChatLogAdapter.value?.itemCount!! - 1
                     } catch (e: java.lang.Exception) {
-                        Log.d("log", "error: ${e.printStackTrace()}")
+//                        Log.d("log", "error: ${e.printStackTrace()}")
                     }
                 }
         toReference.setValue(chatMessage)
                 .addOnSuccessListener {
-                    Log.d("log", "Saved our chat message to To: ${it}")
+//                    Log.d("log", "Saved our chat message to To: ${it}")
                 }
 
 
@@ -645,7 +645,7 @@ class UserPageViewModel : ViewModel() {
         ref.putFile(selectedImageUri!!)
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {
-                        Log.d("log", "image uri: ${it}")
+//                        Log.d("log", "image uri: ${it}")
                         performSendMessage(activity, it.toString())
                     }
                 }
@@ -657,7 +657,7 @@ class UserPageViewModel : ViewModel() {
         imageView.visibility = View.VISIBLE
 
         val intent = Intent(activity, ShowActivity::class.java)
-        Log.d("log", "imageuri: $imageUri")
+//        Log.d("log", "imageuri: $imageUri")
         intent.putExtra(IMAGE_SHOW, imageUri)
 
         val activityOptions: ActivityOptionsCompat =

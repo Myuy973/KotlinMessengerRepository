@@ -33,7 +33,7 @@ class LoginActivity : AppCompatActivity() {
             try {
                 viewModel.performRegister(this)
             } catch (e: Exception) {
-                Log.d("log",  "error: ${e.printStackTrace()}")
+//                Log.d("log",  "error: ${e.printStackTrace()}")
             }
         }
 
@@ -44,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
             try {
                 viewModel.googleSignin(this)
             } catch (e: Exception) {
-                Log.d("log",  "error: ${e.printStackTrace()}")
+//                Log.d("log",  "error: ${e.printStackTrace()}")
             }
         }
 

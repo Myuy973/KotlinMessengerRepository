@@ -26,32 +26,28 @@ class ChatLogActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat_log)
         binding.userPageViewModel = viewModel
         binding.lifecycleOwner = this
-        Log.d("log", "ChatLog start")
+//        Log.d("log", "ChatLog start")
 
+        // チャット相手の取得、タイトルにセット
         toUser = intent.getParcelableExtra<User>(viewModel.USER_KEY)
         supportActionBar?.title = toUser?.userName
 
+        // チャットデータ収集
         viewModel.listenForMessages(toUser, this)
         recyclerview_chat_log.adapter = viewModel.ChatLogAdapter.value
         recyclerview_chat_log.setHasFixedSize(true)
         recyclerview_chat_log.setItemViewCacheSize(20)
-//        recyclerview_chat_log.setDrawingCacheEnabled(true)
-//        recyclerview_chat_log.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH)
-
-//        val imagePipeline = Fresco.getImagePipeline()
-//        // Clear cache
-//        imagePipeline.clearMemoryCaches()
-//        imagePipeline.clearDiskCaches()
 
 
         send_button_chat_log.setOnClickListener {
-            Log.d("log", "attempt to send message...")
+//            Log.d("log", "attempt to send message...")
             viewModel.performSendMessage(this)
         }
         image_select_button.setOnClickListener {
             viewModel.imageSelecterStart(this)
         }
 
+        // 画面遷移アニメーション
         overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
 
     }
@@ -66,7 +62,7 @@ class ChatLogActivity : AppCompatActivity() {
         when (item.itemId) {
             // ChatLogActivityから離れる際にaddChildEventListenerをデタッチする
             android.R.id.home -> {
-                Log.d("log", "push backbutton in actionbar")
+//                Log.d("log", "push backbutton in actionbar")
                 viewModel.eventlistenerFinish()
             }
         }
@@ -76,7 +72,6 @@ class ChatLogActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        Log.d("log", "end activity")
         // ChatLogActivityから離れる際にaddChildEventListenerをデタッチする
         viewModel.eventlistenerFinish()
     }

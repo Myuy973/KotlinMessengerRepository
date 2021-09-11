@@ -24,13 +24,13 @@ class ShowActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_show)
 
         val imageUri = intent.getStringExtra(UserPageViewModel().IMAGE_SHOW) ?: ""
-        Log.d("log", "show Activity imageuri: $imageUri")
+//        Log.d("log", "show Activity imageuri: $imageUri")
 
         ViewCompat.setTransitionName(show_image_preview, VIEW_NAME_HEADER_IMAGE)
         val uri = Uri.parse(imageUri)
         Picasso.get().load(uri).into(show_image_preview)
 //        show_image_preview.setImageURI(uri)
-        Log.d("log", "show Activity visibility : ${show_image_preview.visibility}")
+//        Log.d("log", "show Activity visibility : ${show_image_preview.visibility}")
 
         show_activity_container.setOnClickListener { onBackPressed() }
 

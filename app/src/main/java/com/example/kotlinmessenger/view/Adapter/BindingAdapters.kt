@@ -13,7 +13,7 @@ object BindingAdapters {
     @BindingAdapter("bitmap")
     @JvmStatic
     fun imageBitmapSet(view: CircleImageView, bitmap: Bitmap?) {
-        Log.d("log", "imageBitmapSet start")
+//        Log.d("log", "imageBitmapSet start")
         if (bitmap != null) {
             view.setImageBitmap(bitmap)
         }
