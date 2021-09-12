@@ -3,4 +3,22 @@
     <string name="name_edittext_hint">UserName(25文字以下)</string>
     <string name="email_edittext_hint">Email</string>
     <string name="pass_edittext_hint">英数字8文字以上</string>
+
+    <string name="name_empty">UserNameを入力してください</string>
+    <string name="email_input_error">正しいメールアドレスと入力してください</string>
+    <string name="pass_mismatch">パスワードが英数字8文字以上ではありません</string>
+    <string name="login_error1">The password is invalid or the user does not have a password.</string>
+    <string name="login_error2">There is no user record corresponding to this identifier. The user may have been deleted.</string>
+    <string name="login_error3">We have blocked all requests from this device due to unusual activity. Try again later. [ Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. ]</string>
+    <string name="title_activity_entrance">EntranceActivity</string>
+
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="register_fragment_label">Register Fragment</string>
+    <string name="second_fragment_label">Login Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>

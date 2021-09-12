@@ -19,10 +19,7 @@ import com.example.kotlinmessenger.model.ChatMessage
 import com.example.kotlinmessenger.model.LatestMessageRow
 import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.model.UserItem
-import com.example.kotlinmessenger.view.ChatLogActivity
-import com.example.kotlinmessenger.view.RegisterActivity
-import com.example.kotlinmessenger.view.ShowActivity
-import com.example.kotlinmessenger.view.ShowProfileActivity
+import com.example.kotlinmessenger.view.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -96,7 +93,8 @@ class UserPageViewModel : ViewModel() {
         // firebaseにログインしているかどうか
         val uid = FirebaseAuth.getInstance().uid
         if (uid == null) {
-            val intent = Intent(activity, RegisterActivity::class.java)
+//            val intent = Intent(activity, RegisterActivity::class.java)
+            val intent = Intent(activity, EntranceActivity::class.java)
             // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             activity.startActivity(intent)
