@@ -12,12 +12,42 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/selectphoto_button_register"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="16dp"
+                android:alpha="@{loginviewModel.buttonAlpha}"
+                android:background="@drawable/rounded_photo_select_button"
+                android:text="select photo"
+                android:textSize="14sp"
+                app:backgroundTint="@color/button_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/registerToolbar" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/selectphoto_imageview_register"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="16dp"
+                app:bitmap="@{loginviewModel.bitmap}"
+                app:civ_border_width="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/selectphoto_button_register"
+                app:layout_constraintEnd_toEndOf="@+id/selectphoto_button_register"
+                app:layout_constraintStart_toStartOf="@+id/selectphoto_button_register"
+                app:layout_constraintTop_toBottomOf="@+id/registerToolbar" />
+
+
 
             <EditText
                 android:id="@+id/username_edittext_register"
@@ -33,6 +63,7 @@
                 android:maxLength="25"
                 android:paddingLeft="16dp"
                 android:text="@={loginviewModel.userName}"
+                android:theme="@style/EditTextFocusTheme"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -49,6 +80,7 @@
                 android:inputType="textEmailAddress"
                 android:paddingLeft="16dp"
                 android:text="@={loginviewModel.userEmail}"
+                android:theme="@style/EditTextFocusTheme"
                 app:layout_constraintEnd_toEndOf="@+id/username_edittext_register"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="@+id/username_edittext_register"
@@ -66,6 +98,7 @@
                 android:inputType="textPassword"
                 android:paddingLeft="16dp"
                 android:text="@={loginviewModel.userPassword}"
+                android:theme="@style/EditTextFocusTheme"
                 app:layout_constraintEnd_toEndOf="@+id/email_edittext_register"
                 app:layout_constraintStart_toStartOf="@+id/email_edittext_register"
                 app:layout_constraintTop_toBottomOf="@+id/email_edittext_register" />
@@ -96,32 +129,6 @@
                 app:layout_constraintStart_toStartOf="@+id/register_button_register"
                 app:layout_constraintTop_toBottomOf="@+id/register_button_register" />
 
-            <Button
-                android:id="@+id/selectphoto_button_register"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_marginTop="16dp"
-                android:alpha="@{loginviewModel.buttonAlpha}"
-                android:background="@drawable/rounded_photo_select_button"
-                android:text="select photo"
-                android:textSize="14sp"
-                app:backgroundTint="@color/button_color"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/registerToolbar" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/selectphoto_imageview_register"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_marginTop="16dp"
-                app:bitmap="@{loginviewModel.bitmap}"
-                app:civ_border_width="4dp"
-                app:layout_constraintBottom_toBottomOf="@+id/selectphoto_button_register"
-                app:layout_constraintEnd_toEndOf="@+id/selectphoto_button_register"
-                app:layout_constraintStart_toStartOf="@+id/selectphoto_button_register"
-                app:layout_constraintTop_toBottomOf="@+id/registerToolbar" />
 
             <ImageView
                 android:id="@+id/google_signin_button"
@@ -129,13 +136,13 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="32dp"
                 android:background="@drawable/rounded_google_login"
+                android:contentDescription="TODO"
                 android:elevation="5dp"
                 android:padding="7dp"
                 app:layout_constraintEnd_toEndOf="@+id/register_button_register"
                 app:layout_constraintStart_toStartOf="@+id/register_button_register"
                 app:layout_constraintTop_toBottomOf="@+id/already_have_an_account_textView"
-                app:srcCompat="@drawable/google"
-                android:contentDescription="TODO" />
+                app:srcCompat="@drawable/google" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/signin_progressBar"

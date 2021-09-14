@@ -98,14 +98,17 @@ class UserPageViewModel(
 
     // --------------------- LatestMessage -------------------------------------------------
 
-    fun verifyUserIsLoggedIn() {
+    fun verifyUserIsLoggedIn(): Boolean {
         // firebaseにログインしているかどうか
         val uid = FirebaseAuth.getInstance().uid
+        Log.d("log", "uid: $uid")
         if (uid == null) {
 //         activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
 //            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             latestMessagePageEvent.value = Event("toRegister")
+            return false
         }
+        return true
     }
 
      fun fetchCurrentUser() {

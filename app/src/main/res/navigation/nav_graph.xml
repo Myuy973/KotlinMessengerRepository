@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/RegisterFragment">
+    app:startDestination="@id/LatestMessagesFragment">
 
     <fragment
         android:id="@+id/RegisterFragment"
@@ -50,7 +50,9 @@
             android:defaultValue="false" />
         <action
             android:id="@+id/action_ShowProfile_to_LatestMessages"
-            app:destination="@id/LatestMessagesFragment" />
+            app:destination="@id/LatestMessagesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -93,7 +95,9 @@
             app:exitAnim="@anim/slide_out_left" />
         <action
             android:id="@+id/action_NewMessages_to_LatestMessages"
-            app:destination="@id/LatestMessagesFragment" />
+            app:destination="@id/LatestMessagesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/ChatLogFragment"
@@ -105,7 +109,9 @@
             app:argType="com.example.kotlinmessenger.model.User" />
         <action
             android:id="@+id/action_ChatLog_to_NewMessages"
-            app:destination="@id/NewMessagesFragment" />
+            app:destination="@id/NewMessagesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_right" />
     </fragment>
 
 </navigation>

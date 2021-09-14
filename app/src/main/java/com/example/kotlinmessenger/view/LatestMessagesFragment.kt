@@ -66,9 +66,12 @@ class LatestMessagesFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        viewModel.verifyUserIsLoggedIn()
-        viewModel.fetchCurrentUser()
-        viewModel.listenForLatestMessages()
+        // ログインしているかどうか
+        if (viewModel.verifyUserIsLoggedIn()) {
+            viewModel.fetchCurrentUser()
+            viewModel.listenForLatestMessages()
+        }
+
 
     // Toolbarでアイテムが押されたときのアクション
         latest_messages_toolbar.setOnMenuItemClickListener { item ->

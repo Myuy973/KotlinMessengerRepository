@@ -4,11 +4,11 @@
 
     <item
         android:id="@+id/add_friend"
-        android:title="Add Friend"
-        app:showAsAction="never"/>
+        android:title="フレンド追加"
+        app:showAsAction="never" />
     <item
         android:id="@+id/delete_friend"
-        android:title="Delete Friend"
-        app:showAsAction="never"/>
+        android:title="フレンド削除"
+        app:showAsAction="never" />
 
 </menu>

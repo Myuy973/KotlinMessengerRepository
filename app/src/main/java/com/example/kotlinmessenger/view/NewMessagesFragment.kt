@@ -1,6 +1,7 @@
 package com.example.kotlinmessenger.view
 
 import android.app.AlertDialog
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -68,16 +69,19 @@ class NewMessagesFragment : Fragment() {
                 }
 
                 R.id.add_friend -> {
-                    val dialog = AlertDialog.Builder(activity)
+                    val dialog = AlertDialog.Builder(activity, R.style.MyDialogTheme)
                     val view = View.inflate(activity, R.layout.dialog_input_friend_id, null)
                     dialog.setView(view)
                         .setPositiveButton("追加") { _, _ ->
                             val inputUid = view.findViewById<EditText>(R.id.input_friend_user_id_text).text.toString()
-//                        Log.d("log", "input: $inputUid")
                             viewModel.addFriendFunction(inputUid, activity)
                         }
                         .setNegativeButton("キャンセル", null)
-                        .show()
+                    val customDialog = dialog.create()
+                    customDialog.show()
+                    // positive, negativeボタンの色指定
+                    customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(activity.getColor(R.color.black))
+                    customDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(activity.getColor(R.color.dialog_cancel))
                 }
 
                 R.id.delete_friend -> {
@@ -85,7 +89,7 @@ class NewMessagesFragment : Fragment() {
                         it.userName
                     }.toTypedArray()
                     val deleteFriendNumber = mutableListOf<Int>()
-                    val dialog = AlertDialog.Builder(activity)
+                    val dialog = AlertDialog.Builder(activity, R.style.MyDialogTheme)
                     dialog.setTitle("削除するユーザーを選んでください")
                         .setMultiChoiceItems(friendNameList, null) { _, which, isChecked ->
                             if (isChecked) {
@@ -101,7 +105,11 @@ class NewMessagesFragment : Fragment() {
                             viewModel.deleteFriendFunction(deleteFriendNumber, activity)
                         }
                         .setNeutralButton("キャンセル", null)
-                        .show()
+                    val customDialog = dialog.create()
+                    customDialog.show()
+                    // positive, negativeボタンの色指定
+                    customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(activity.getColor(R.color.black))
+                    customDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(activity.getColor(R.color.dialog_cancel))
                 }
             }
 
