@@ -1,3 +1,7 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+
+    <!-- Toolbar elevation   -->
+    <dimen name="toolbar_elevation">10dp</dimen>
+
 </resources>

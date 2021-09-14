@@ -3,13 +3,9 @@ package com.example.kotlinmessenger.model
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Color
-import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.LatestMessageRowBinding
-import com.example.kotlinmessenger.view.LatestMessagesActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

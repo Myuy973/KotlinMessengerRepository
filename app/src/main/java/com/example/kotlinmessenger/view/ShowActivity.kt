@@ -1,16 +1,14 @@
 package com.example.kotlinmessenger.view
 
+import android.app.Application
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityShowBinding
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
-import com.squareup.picasso.MemoryPolicy
-import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show.*
 
@@ -23,7 +21,7 @@ class ShowActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_show)
 
-        val imageUri = intent.getStringExtra(UserPageViewModel().IMAGE_SHOW) ?: ""
+        val imageUri = intent.getStringExtra(UserPageViewModel(application).IMAGE_SHOW) ?: ""
 //        Log.d("log", "show Activity imageuri: $imageUri")
 
         ViewCompat.setTransitionName(show_image_preview, VIEW_NAME_HEADER_IMAGE)
@@ -42,6 +40,7 @@ class ShowActivity : AppCompatActivity() {
                 R.anim.anim_activity_close,
                 R.anim.anim_activity_open
         )
+        UserPageViewModel.hideImage()
     }
 
 }

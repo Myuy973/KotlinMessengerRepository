@@ -1,6 +1,7 @@
 package com.example.kotlinmessenger.viewModel
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -9,42 +10,45 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.lifecycle.*
+import com.example.kotlinmessenger.R
+import com.example.kotlinmessenger.model.*
 import com.example.kotlinmessenger.model.ChatItem.ChatFromItem
 import com.example.kotlinmessenger.model.ChatItem.ChatToItem
-import com.example.kotlinmessenger.model.ChatMessage
-import com.example.kotlinmessenger.model.LatestMessageRow
-import com.example.kotlinmessenger.model.User
-import com.example.kotlinmessenger.model.UserItem
 import com.example.kotlinmessenger.view.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieAdapter
-import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import okhttp3.Dispatcher
 import java.util.*
 import kotlin.collections.HashMap
 
-class UserPageViewModel : ViewModel() {
+class UserPageViewModel(
+    private val myApplication: Application
+) : AndroidViewModel(myApplication) {
 
     val USER_KEY = "USER_KEY"
     val PROFILE_IMAGE_CHANGE = 2
     val IMAGE_SELECT = 1
     val IMAGE_SHOW = "IMAGE_SHOW"
 
+    val latestLoadingValue = MutableLiveData<Int>(View.VISIBLE)
+    val latestMessagePageEvent = MutableLiveData<Event<String>>()
     val LatestMessagesAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     private var LatestOldList = mutableListOf<LatestMessageRow>()
     private val latestMessageMap = HashMap<String, ChatMessage>()
 
+    val showProfilePageEvent = MutableLiveData<Event<String>>()
     var updateProfileErrorList = mutableListOf<String>()
     lateinit var currentUserCopy: User
     lateinit var profileImageUri: Uri
@@ -61,9 +65,11 @@ class UserPageViewModel : ViewModel() {
     val rogressbarType = MutableLiveData<Int>(View.GONE)
 
 
+    val newMessagesPageEvent = MutableLiveData<Event<String>>()
     val NewMessageAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     var friendList = arrayOf<User>()
 
+    val chatLogPageEvent = MutableLiveData<Event<String>>()
     val ChatLogAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     val chatInputText = MutableLiveData<String>("")
     var scrollPosition = MutableLiveData<Int>(0)
@@ -76,28 +82,29 @@ class UserPageViewModel : ViewModel() {
 
     companion object {
         lateinit var currentUser: User
+        var userPageToastText = MutableLiveData<String>("")
+        fun printToast(text: String) {
+            userPageToastText.value = text
+        }
+        var showImageData = MutableLiveData<Pair<ImageView, String>?>(null)
+        fun showImage(imageView: ImageView, uri: String) {
+            showImageData.value = Pair(imageView, uri)
+        }
+        fun hideImage() {
+            showImageData.value = null
+        }
     }
-
-
-    // --------------------- common Function -------------------------------------------------
-
-    fun printToast(text: String, activity: Activity) {
-        Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
-    }
-
 
 
     // --------------------- LatestMessage -------------------------------------------------
 
-    fun verifyUserIsLoggedIn(activity: Activity) {
+    fun verifyUserIsLoggedIn() {
         // firebaseにログインしているかどうか
         val uid = FirebaseAuth.getInstance().uid
         if (uid == null) {
-//            val intent = Intent(activity, RegisterActivity::class.java)
-            val intent = Intent(activity, EntranceActivity::class.java)
-            // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-            activity.startActivity(intent)
+//         activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            latestMessagePageEvent.value = Event("toRegister")
         }
     }
 
@@ -109,7 +116,8 @@ class UserPageViewModel : ViewModel() {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         try {
                             currentUser = snapshot.getValue(User::class.java)!!
-//                            Log.d("log", "Login user: ${currentUser.userName}")
+                            latestLoadingValue.value = View.GONE
+//                            Log.d("log", "latestLoadingValue: ${latestLoadingValue.value}")
                         } catch (e: Exception) {
 //                            Log.d("log", "login user error: $e")
                         }
@@ -118,6 +126,7 @@ class UserPageViewModel : ViewModel() {
                     override fun onCancelled(error: DatabaseError) {}
                 })
     }
+
 
     private fun refreshRecyclerViewMessages(addOrChangeType: String, changePosition: Int = 0, key: String = "") {
         if (addOrChangeType == "Add") {
@@ -145,6 +154,7 @@ class UserPageViewModel : ViewModel() {
 
 
     fun listenForLatestMessages() {
+//        Log.d("log", "latestLoadingValue2: ${latestLoadingValue.value}")
 
         val fromId = FirebaseAuth.getInstance().uid!!
         val ref = FirebaseDatabase.getInstance().getReference("latest-messages/$fromId")
@@ -200,7 +210,7 @@ class UserPageViewModel : ViewModel() {
 //        Log.d("log", "edittext: ${editUserNameText.value}, ${editUserEmailText.value}")
     }
 
-    fun setUpchecker() {
+    fun setUpchuck() {
         listOf(editUserNameText, editUserEmailText, editUserPassText).forEach { liveData ->
             liveData.asFlow()
                     .onEach { inputTextCheck() }
@@ -213,17 +223,17 @@ class UserPageViewModel : ViewModel() {
         bitmap.value = MediaStore.Images.Media.getBitmap(activity.contentResolver, profileImageUri)
     }
 
-    fun inputTextCheck() {
+    private fun inputTextCheck() {
         updateButtonType.value =
                 editUserEmailText.value?.isNotEmpty()!! &&
                 editUserEmailText.value?.isNotEmpty()!! &&
                 editUserPassText.value?.isNotEmpty()!!
     }
 
-    fun userProfileUpdate(activity: Activity, loginType: Boolean) {
+    fun userProfileUpdate(loginType: Boolean) {
 
         if (loginType) {
-            printToast("SNSログインの場合は編集できません", activity)
+            userPageToastText.value = "SNSログインの場合は編集できません"
             return
         }
 
@@ -248,7 +258,7 @@ class UserPageViewModel : ViewModel() {
 
         if (updateProfileErrorList.isNotEmpty()) {
             val errorMessage = updateProfileErrorList.joinToString(separator = "\n")
-            printToast(errorMessage, activity)
+            userPageToastText.value = errorMessage
             rogressbarType.value = View.GONE
             return
         }
@@ -352,11 +362,11 @@ class UserPageViewModel : ViewModel() {
             if (updateProfileErrorList.isNotEmpty()) {
                 rogressbarType.value = View.GONE
                 if (updateProfileErrorList[0] == updateProfileErrorList[1]) {
-                    printToast(updateProfileErrorList[0], activity)
+                    userPageToastText.value = updateProfileErrorList[0]
                     return@withContext
                 }
                 val errorMessage = updateProfileErrorList.joinToString(separator = "\n")
-                printToast(errorMessage, activity)
+                userPageToastText.value = errorMessage
             } else {
                 rogressbarType.value = View.GONE
                 bitmap.value = null
@@ -366,7 +376,7 @@ class UserPageViewModel : ViewModel() {
                 updateAccessLimiter = false
                 fetchCurrentUser()
                 userInfoDisplay(currentUserCopy.profileImageUri, currentUserCopy.userName, currentUserCopy.userEmail)
-                printToast("更新完了", activity)
+                userPageToastText.value = "更新完了"
             }
         }
     }
@@ -374,7 +384,7 @@ class UserPageViewModel : ViewModel() {
     // エラーメッセージからユーザへのメッセージを選別
     private fun errorSetter(error: String): String {
         return when (error) {
-            "This operation is sensitive and requires recent authentication. Log in again before retrying this request." ->
+            myApplication.getString(R.string.update_error1) ->
                 "再度ログインしてください"
             else -> "error"
         }
@@ -383,7 +393,7 @@ class UserPageViewModel : ViewModel() {
 
     // ------------------------------ NewMessageActivity ------------------------------------------------
 
-    fun fetchUserFriends(activity: Activity) {
+    fun fetchUserFriends() {
         friendList = arrayOf()
         val ref = FirebaseDatabase.getInstance().getReference("/user-friends/${currentUser.uid}")
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -411,19 +421,6 @@ class UserPageViewModel : ViewModel() {
 
                     }
                 }
-
-                NewMessageAdapter.value?.setOnItemClickListener { item, view ->
-
-                    val userItem = item as UserItem
-
-                    val intent = Intent(view.context, ChatLogActivity::class.java)
-                    intent.putExtra(USER_KEY, userItem.user)
-                    activity.startActivity(intent)
-
-                    activity.finish()
-                }
-
-
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -435,10 +432,10 @@ class UserPageViewModel : ViewModel() {
 //        Log.d("log", "start addFriendFunction")
 
         if (currentUser.uid == friendUid) {
-            printToast("自分を追加することはできません", activity)
+            userPageToastText.value = "自分を追加することはできません"
             return
         } else if (friendUid.isEmpty()) {
-            printToast("ユーザーのIDを入力してください", activity)
+            userPageToastText.value = "ユーザーのIDを入力してください"
             return
         }
 
@@ -455,17 +452,17 @@ class UserPageViewModel : ViewModel() {
                 myFriendRef.setValue(mapOf("uid" to friendUid))
                 yourFriendRef.setValue(mapOf("uid" to currentUser.uid))
 
-                fetchUserFriends(activity)
+                fetchUserFriends()
 
-                printToast("${it.getValue(User::class.java)?.userName}さんを追加しました！", activity)
+                userPageToastText.value = "${it.getValue(User::class.java)?.userName}さんを追加しました！"
 
             } catch (e: java.lang.Exception) {
-                printToast("ユーザー追加に失敗しました", activity)
+                userPageToastText.value = "ユーザー追加に失敗しました"
 //                Log.d("log", "add friend error: ${e.printStackTrace()}")
             }
 
         }.addOnFailureListener {
-                printToast("ユーザー追加に失敗しました", activity)
+                userPageToastText.value = "ユーザー追加に失敗しました"
 //                Log.d("log", "add friend error: ${it.printStackTrace()}")
         }
 
@@ -475,7 +472,7 @@ class UserPageViewModel : ViewModel() {
     fun deleteFriendFunction(deleteList: List<Int>, activity: Activity) {
 
         if (deleteList.isEmpty()) {
-            printToast("削除するユーザーを選んでください", activity)
+            userPageToastText.value = "削除するユーザーを選んでください"
             return
         }
 
@@ -494,10 +491,10 @@ class UserPageViewModel : ViewModel() {
                 removeMyFriendRef.removeValue()
                 removeYourFriendRef.removeValue()
             }
-            fetchUserFriends(activity)
-            printToast("削除に成功しました。", activity)
+            fetchUserFriends()
+            userPageToastText.value = "削除に成功しました。"
         } catch (e: java.lang.Exception) {
-            printToast("削除に失敗しました。", activity)
+            userPageToastText.value = "削除に失敗しました。"
         }
 
     }
@@ -532,11 +529,11 @@ class UserPageViewModel : ViewModel() {
                 if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
                     val currentUser = currentUser
                     ChatLogAdapter.value?.add(
-                        ChatFromItem(chatMessage.imageUrl, chatMessage.text, currentUser, activity)
+                        ChatFromItem(chatMessage.imageUrl, chatMessage.text, currentUser)
                     )
                 } else {
                     ChatLogAdapter.value?.add(
-                        ChatToItem(chatMessage.imageUrl, chatMessage.text, toUser!!, activity)
+                        ChatToItem(chatMessage.imageUrl, chatMessage.text, toUser!!)
                     )
                 }
 
@@ -563,6 +560,7 @@ class UserPageViewModel : ViewModel() {
     }
 
     // addChildEventListenerデタッチ処理
+    // そのままだとメッセージを読んでないのに既読になってしまう
     fun eventlistenerFinish() {
         val fromId = currentUser.uid
         val ref = FirebaseDatabase.getInstance()
@@ -583,7 +581,8 @@ class UserPageViewModel : ViewModel() {
 //        Log.d("log", "subText: [${omitToSpace}]")
 //        Log.d("log", "${!notEmptyPattern.matches(omitToSpace)}, ${omitToSpace.isEmpty()}, ${!imageSelectedType}")
         if ((!notEmptyPattern.matches(omitToSpace) || omitToSpace.isEmpty()) && !imageSelectedType) {
-            printToast("テキストを入力してください", activity)
+
+            userPageToastText.value = "テキストを入力してください"
             return
         }
 
@@ -628,11 +627,6 @@ class UserPageViewModel : ViewModel() {
 
     }
 
-    fun imageSelecterStart(activity: Activity) {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        activity.startActivityForResult(intent, IMAGE_SELECT)
-    }
 
     fun imageSelectedFunction(data: Intent?, activity: Activity) {
         imageSelectedType = true
@@ -649,24 +643,7 @@ class UserPageViewModel : ViewModel() {
                 }
     }
 
-    @SuppressWarnings("unchecked")
-    fun changeToShowActivity(imageView: View, imageUri: String, activity: Activity) {
 
-        imageView.visibility = View.VISIBLE
-
-        val intent = Intent(activity, ShowActivity::class.java)
-//        Log.d("log", "imageuri: $imageUri")
-        intent.putExtra(IMAGE_SHOW, imageUri)
-
-        val activityOptions: ActivityOptionsCompat =
-            ActivityOptionsCompat.makeSceneTransitionAnimation(
-                activity,
-                Pair(imageView, ShowActivity().VIEW_NAME_HEADER_IMAGE)
-        )
-
-        ActivityCompat.startActivity(activity, intent, activityOptions.toBundle())
-
-    }
 
 
 

@@ -12,27 +12,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KotlinMessenger"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.LatestMessagesActivity">
+
+        <activity
+            android:name=".view.MessengerActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.EntranceActivity" />
-        <activity android:name=".view.ShowProfileActivity" />
-        <activity android:name=".view.NewMessageActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".view.LatestMessagesActivity" />
-        </activity>
-        <activity
-            android:name=".view.ChatLogActivity"
-            android:theme="@style/ChatCustomBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".view.LatestMessagesActivity" />
-        </activity>
+
         <activity
             android:name=".view.ShowActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />

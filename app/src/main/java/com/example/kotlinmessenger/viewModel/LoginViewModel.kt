@@ -29,12 +29,16 @@ import kotlinx.coroutines.flow.onEach
 import java.util.*
 
 class LoginViewModel(
-        private val myApplication: Application,
+        private val myApplication: Application
 ) : AndroidViewModel(myApplication) {
 
     val IMAGE_INPUT = 1
     val GOOGLE_SIGNIN = 2
 
+    // messenger page event
+    val registerPageEvent = MutableLiveData<Event<String>>()
+    // messenger page event
+    val loginPageEvent = MutableLiveData<Event<String>>()
 
     // progressBar visibility
     val progressbarType = MutableLiveData<Int>(View.GONE)
@@ -76,10 +80,8 @@ class LoginViewModel(
     //-------------------------------------------------------
 
     companion object {
-        // entrance page event
-        val entrancePageEvent = MutableLiveData<Event<String>>()
-        // entrance toast
-        val entranceToastText = MutableLiveData<String>("")
+        // messenger toast
+        val loginToastText = MutableLiveData<String>("")
     }
 
 
@@ -167,24 +169,13 @@ class LoginViewModel(
     }
 
 
-    // ----------------- common Function -------------------------------------------
-//    fun toastPrint(text: String, activityName: String) {
-//        when (activityName) {
-//            ".view.RegisterActivity" -> {
-//                registerToastText.value = text
-//            }
-//            ".view.LoginActivity" -> {
-//                loginToastText.value = text
-//            }
-//        }
-//    }
-
     // ----------------- common Signin Function -------------------------------------------
 
     private fun saveUserToFirebaseDatabase(profileImageUri: String,
                                            userName: String,
                                            userEmail: String,
-                                           snsLogin: Boolean) {
+                                           snsLogin: Boolean,
+                                           fromFragment: String) {
 
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = Firebase.database.getReference("users/$uid")
@@ -193,11 +184,13 @@ class LoginViewModel(
 
         ref.setValue(user).addOnSuccessListener {
 //            toastPrint("ようこそ ${user.userName}さん", activityName)
-            entranceToastText.value = "ようこそ ${user.userName}さん"
-            if (snsLogin) {
-                entrancePageEvent.value = Event("enterWithSNS")
-            } else {
-                entrancePageEvent.value = Event("enter")
+            loginToastText.value = "ようこそ ${user.userName}さん"
+            progressbarType.value = View.GONE
+
+            val event = if (snsLogin) Event("enterWithSNS") else Event("enter")
+            when (fromFragment) {
+                "Login" -> loginPageEvent.value = event
+                "Register" -> registerPageEvent.value = event
             }
 //            Log.d("log", "Finally we saved the user to Firebase Database")
 //            Log.d("log", "snsLogin: $snsLogin")
@@ -209,7 +202,7 @@ class LoginViewModel(
 //            activity.startActivity(intent)
         }.addOnFailureListener {
             progressbarType.value = View.GONE
-//            Log.d("log", "save is not Success")
+            loginToastText.value = "ログインに失敗しました"
         }
     }
 
@@ -243,7 +236,7 @@ class LoginViewModel(
                     progressbarType.value = View.GONE
                     val error = signErrorMessage.joinToString(separator = "\n")
 //                    toastPrint(error, ".view.RegisterActivity")
-                    entranceToastText.value = error
+                    loginToastText.value = error
 //                    Log.d("log", error)
                     return
                 }
@@ -255,7 +248,7 @@ class LoginViewModel(
                     progressbarType.value = View.GONE
                     val error = loginErrorMessage.joinToString(separator = "\n")
 //                    toastPrint(error, ".view.LoginActivity")
-                    entranceToastText.value = error
+                    loginToastText.value = error
 //                    Log.d("log", error)
                     return
                 }
@@ -276,7 +269,7 @@ class LoginViewModel(
                             progressbarType.value = View.GONE
 //                            Log.d("log", "error: ${it.message}")
 //                            toastPrint("ユーザー作成に失敗しました。", activity)
-                            entranceToastText.value = "ユーザー作成に失敗しました"
+                            loginToastText.value = "ユーザー作成に失敗しました"
                         }
             }
             "Login" -> {
@@ -288,17 +281,12 @@ class LoginViewModel(
                             ref.get().addOnSuccessListener {
                                 val user = it.getValue(User::class.java)
 //                                toastPrint("ようこそ ${user?.userName}", activity)
-                                entranceToastText.value = "ようこそ ${user?.userName}"
+                                loginToastText.value = "ようこそ ${user?.userName}"
                             }
 
-                            entrancePageEvent.value = Event("enter")
-                        //                            val intent = Intent(activity, LatestMessagesActivity::class.java)
-//                            intent.putExtra("fromActivity", "SigninOrLogin")
+                            progressbarType.value = View.GONE
+                            loginPageEvent.value = Event("enter")
 //                            // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
-//                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                            activity.startActivity(intent)
-
-//                            Log.d("log", "Successfully Login")
                         }
                         .addOnFailureListener {
 //                            Log.d("log", "Failed to login: ${it.message}")
@@ -307,11 +295,11 @@ class LoginViewModel(
                                 myApplication.getString(R.string.login_error1),
                                 myApplication.getString(R.string.login_error2) -> {
 //                                    toastPrint("メールアドレスまたはパスワードが違います。", activity)
-                                    entranceToastText.value = "メールアドレスまたはパスワードが違います"
+                                    loginToastText.value = "メールアドレスまたはパスワードが違います"
                                 }
                                 myApplication.getString(R.string.login_error3) -> {
 //                                    toastPrint("規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。", activity)
-                                    entranceToastText.value = "規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。"
+                                    loginToastText.value = "規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。"
                                 }
 
                             }
@@ -331,7 +319,7 @@ class LoginViewModel(
             .addOnSuccessListener {
 //                Log.d("log", "successfully uploaded image")
                 ref.downloadUrl.addOnSuccessListener {
-                    saveUserToFirebaseDatabase(it.toString(), userName.value!!, userEmail, false)
+                    saveUserToFirebaseDatabase(it.toString(), userName.value!!, userEmail, false, "Register")
                 }
             }
             .addOnFailureListener { e ->
@@ -347,19 +335,18 @@ class LoginViewModel(
     //------------------ Google Signin --------------------------------
 
 
-    fun googleSigninFunction(data: Intent?, activity: Activity) {
+    fun googleSigninFunction(data: Intent?, fromFragment: String, activity: Activity) {
+        progressbarType.value = View.VISIBLE
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
         try {
             val account = task.getResult(ApiException::class.java)!!
-            firebaseAuthWithGoogle(account.idToken!!, activity)
+            firebaseAuthWithGoogle(account.idToken!!, fromFragment,  activity)
         } catch (e: Exception) {
-            entranceToastText.value = "onActivityResult error: ${e.printStackTrace()}"
-        //            toastPrint("onActivityResult error: ${e.printStackTrace()}", activity)
-//            Log.d("log", "onActivityResult error: ${e.message}")
+            loginToastText.value = "onActivityResult error: ${e.printStackTrace()}"
         }
     }
 
-    private fun firebaseAuthWithGoogle(idToken: String, activity: Activity) {
+    private fun firebaseAuthWithGoogle(idToken: String, fromFragment: String, activity: Activity) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(activity) { task ->
@@ -368,9 +355,9 @@ class LoginViewModel(
                         val email = auth.currentUser?.email
                         val photourl = auth.currentUser?.photoUrl
 //                        Log.d("log", "google signin success : name: $name, email: $email, photourl: $photourl")
-                        saveUserToFirebaseDatabase(photourl!!.toString(), name!!, email!!, true)
+                        saveUserToFirebaseDatabase(photourl!!.toString(), name!!, email!!, true, fromFragment)
                     } else {
-                        entranceToastText.value = "firebaseAuthWithGoogle error: ${task.exception}"
+                        loginToastText.value = "firebaseAuthWithGoogle error: ${task.exception}"
 //                        toastPrint("firebaseAuthWithGoogle error: ${task.exception}", activity)
 //                        Log.d("log", "firebaseAuthWithGoogle error: ${task.exception}")
                     }

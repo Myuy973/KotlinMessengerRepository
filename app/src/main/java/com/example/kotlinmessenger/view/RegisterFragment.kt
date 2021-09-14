@@ -1,11 +1,13 @@
 package com.example.kotlinmessenger.view
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -13,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FragmentRegisterBinding
+import com.example.kotlinmessenger.model.EventObserver
 import com.example.kotlinmessenger.viewModel.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import kotlinx.android.synthetic.main.fragment_register.*
@@ -39,6 +42,7 @@ class RegisterFragment : Fragment() {
         binding.loginviewModel = viewModel
         binding.lifecycleOwner = activity
 
+        registerToolbar.title = activity.getString(R.string.app_name)
 
         selectphoto_button_register.setOnClickListener {
 //            Log.d("log", "try  to show photo selector")
@@ -50,7 +54,7 @@ class RegisterFragment : Fragment() {
         }
 
         already_have_an_account_textView.setOnClickListener {
-            findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)
+            findNavController().navigate(R.id.action_Register_to_Login)
         }
         google_signin_button.setOnClickListener {
             googleSignin()
@@ -58,7 +62,22 @@ class RegisterFragment : Fragment() {
 
         signin_progressBar.setOnTouchListener { _, _ -> true }
 
-//        overridePendingTransition(R.anim.fui_slide_in_right, R.anim.fui_slide_out_left)
+        viewModel.registerPageEvent.observe(viewLifecycleOwner, EventObserver { destination: String ->
+            when (destination) {
+                "enter" -> {
+                    hideKeyboard()
+                    findNavController().navigate(R.id.action_Register_to_LatestMessages)
+                }
+                "enterWithSNS" -> {
+                    hideKeyboard()
+                    val action =
+                        RegisterFragmentDirections.actionRegisterToLatestMessages(true)
+                    findNavController().navigate(action)
+
+                }
+            }
+        })
+
 
     }
 
@@ -73,7 +92,7 @@ class RegisterFragment : Fragment() {
 
         } else if (requestCode == viewModel.GOOGLE_SIGNIN) {
 
-            viewModel.googleSigninFunction(data, activity)
+            viewModel.googleSigninFunction(data, "Register", activity)
 
         }
 
@@ -91,6 +110,12 @@ class RegisterFragment : Fragment() {
         startActivityForResult(intent, requestCode)
         //        startActivityForResultFunction = googleSigninFunction
     }
+
+    private fun hideKeyboard() {
+        val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(view?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+    }
+
 
 
 

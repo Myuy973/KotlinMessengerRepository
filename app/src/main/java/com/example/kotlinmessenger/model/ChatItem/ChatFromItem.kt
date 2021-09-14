@@ -1,6 +1,5 @@
 package com.example.kotlinmessenger.model.ChatItem
 
-import android.app.Activity
 import android.net.Uri
 import android.view.View
 import com.example.kotlinmessenger.R
@@ -12,7 +11,7 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.databinding.BindableItem
 
-class ChatFromItem(val imageUri: String, val text: String, val user: User, val activity: Activity): BindableItem<ChatFromRowBinding>() {
+class ChatFromItem(val imageUri: String, val text: String, val user: User): BindableItem<ChatFromRowBinding>() {
     override fun bind(viewBinding: ChatFromRowBinding, position: Int) {
 
         if (imageUri == "") {
@@ -46,7 +45,7 @@ class ChatFromItem(val imageUri: String, val text: String, val user: User, val a
             sendImageView.visibility = View.VISIBLE
 
             sendImageView.setOnClickListener {
-                UserPageViewModel().changeToShowActivity(sendImageView, imageUri, activity)
+                UserPageViewModel.showImage(sendImageView, imageUri)
             }
 
             val uri = Uri.parse(user.profileImageUri)

@@ -11,8 +11,13 @@
         android:label="@string/register_fragment_label"
         tools:layout="@layout/fragment_register">
         <action
-            android:id="@+id/action_RegisterFragment_to_LoginFragment"
+            android:id="@+id/action_Register_to_Login"
             app:destination="@id/LoginFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_Register_to_LatestMessages"
+            app:destination="@id/LatestMessagesFragment"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left" />
     </fragment>
@@ -20,13 +25,87 @@
     <fragment
         android:id="@+id/LoginFragment"
         android:name="com.example.kotlinmessenger.view.LoginFragment"
-        android:label="@string/second_fragment_label"
+        android:label="@string/login_fragment_label"
         tools:layout="@layout/fragment_login">
         <action
-            android:id="@+id/action_LoginFragment_to_RegisterFragment"
+            android:id="@+id/action_Login_to_Register"
             app:destination="@id/RegisterFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_Login_to_LatestMessages"
+            app:destination="@id/LatestMessagesFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ShowProfileFragment"
+        android:name="com.example.kotlinmessenger.view.ShowProfileFragment"
+        android:label="@string/show_profile_fragment_label"
+        tools:layout="@layout/fragment_show_profile">
+        <argument
+            android:name="snsLoginType"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_ShowProfile_to_LatestMessages"
+            app:destination="@id/LatestMessagesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/LatestMessagesFragment"
+        android:name="com.example.kotlinmessenger.view.LatestMessagesFragment"
+        android:label="@string/latest_messages_fragment_label"
+        tools:layout="@layout/fragment_latest_messages">
+        <action
+            android:id="@+id/action_LatestMessages_to_NewMessages"
+            app:destination="@id/NewMessagesFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_LatestMessages_to_ChatLog"
+            app:destination="@id/ChatLogFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <argument
+            android:name="sns_login_type"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_LatestMessages_to_ShowProfile"
+            app:destination="@id/ShowProfileFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_LatestMessages_to_Register"
+            app:destination="@id/RegisterFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/NewMessagesFragment"
+        android:name="com.example.kotlinmessenger.view.NewMessagesFragment"
+        android:label="@string/new_messages_fragment_label"
+        tools:layout="@layout/fragment_new_messages">
+        <action
+            android:id="@+id/action_NewMessages_to_ChatLog"
+            app:destination="@id/ChatLogFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_NewMessages_to_LatestMessages"
+            app:destination="@id/LatestMessagesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ChatLogFragment"
+        android:name="com.example.kotlinmessenger.view.ChatLogFragment"
+        android:label="@string/chat_log_fragment_label"
+        tools:layout="@layout/fragment_chat_log">
+        <argument
+            android:name="partner_user"
+            app:argType="com.example.kotlinmessenger.model.User" />
+        <action
+            android:id="@+id/action_ChatLog_to_NewMessages"
+            app:destination="@id/NewMessagesFragment" />
     </fragment>
 
 </navigation>
