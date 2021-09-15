@@ -154,7 +154,8 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="50dp"
                 android:ems="10"
-                android:hint="@string/pass_edittext_hint"
+                android:enabled="@{viewModel.passEditTextEnableType}"
+                android:hint="@{viewModel.passEditTextHint}"
                 android:inputType="textPassword"
                 android:text="@={viewModel.editUserPassText}"
                 android:textSize="14sp"
@@ -176,20 +177,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/profile_edit_user_pass" />
 
 
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/update_progressBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#BF686666"
                 android:elevation="20dp"
-                android:visibility="@{viewModel.rogressbarType}"
+                android:visibility="@{viewModel.progressBarType}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <ProgressBar
                     android:id="@+id/progressBar"

@@ -1,13 +1,11 @@
 package com.example.kotlinmessenger.view
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -45,7 +43,6 @@ class RegisterFragment : Fragment() {
         registerToolbar.title = activity.getString(R.string.app_name)
 
         selectphoto_button_register.setOnClickListener {
-//            Log.d("log", "try  to show photo selector")
             inputImage()
         }
 
@@ -60,16 +57,18 @@ class RegisterFragment : Fragment() {
             googleSignin()
         }
 
+        // ローディング画面　タップ無効化
         signin_progressBar.setOnTouchListener { _, _ -> true }
 
+        // 画面遷移
         viewModel.registerPageEvent.observe(viewLifecycleOwner, EventObserver { destination: String ->
             when (destination) {
                 "enter" -> {
-                    hideKeyboard()
+                    (activity as MessengerActivity).hideKeyboard()
                     findNavController().navigate(R.id.action_Register_to_LatestMessages)
                 }
                 "enterWithSNS" -> {
-                    hideKeyboard()
+                    (activity as MessengerActivity).hideKeyboard()
                     val action =
                         RegisterFragmentDirections.actionRegisterToLatestMessages(true)
                     findNavController().navigate(action)
@@ -85,7 +84,6 @@ class RegisterFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-//        Log.d("log", "requestCode: $requestCode, resultCode: $resultCode, data: $data")
         if (requestCode == viewModel.IMAGE_INPUT && resultCode == Activity.RESULT_OK && data != null) {
 
             viewModel.imageSetFunction(data, activity)
@@ -108,13 +106,9 @@ class RegisterFragment : Fragment() {
         val intent = viewModel.googleSignInClient.signInIntent
         val requestCode = viewModel.GOOGLE_SIGNIN
         startActivityForResult(intent, requestCode)
-        //        startActivityForResultFunction = googleSigninFunction
     }
 
-    private fun hideKeyboard() {
-        val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputManager.hideSoftInputFromWindow(view?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-    }
+
 
 
 

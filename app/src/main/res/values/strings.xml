@@ -7,6 +7,7 @@
     <string name="name_empty">UserNameを入力してください</string>
     <string name="email_input_error">正しいメールアドレスと入力してください</string>
     <string name="pass_mismatch">パスワードが英数字8文字以上ではありません</string>
+    <string name="pass_mismatch_sns_login">入力は必要ありません</string>
     <string name="login_error1">The password is invalid or the user does not have a password.</string>
     <string name="login_error2">There is no user record corresponding to this identifier. The user may have been deleted.</string>
     <string name="login_error3">We have blocked all requests from this device due to unusual activity. Try again later. [ Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. ]</string>

@@ -59,50 +59,36 @@ class ChatLogFragment : Fragment() {
         chat_log_toolbar.title = toUser.userName
         chat_log_toolbar.navigationIcon = resources.getDrawable(R.drawable.ic_small_back_button)
         chat_log_toolbar.setNavigationOnClickListener {
+            (activity as MessengerActivity).hideKeyboard()
             findNavController().navigate(R.id.action_ChatLog_to_NewMessages)
+            onDestroy()
         }
 
 
         // チャットデータ収集
-        viewModel.listenForMessages(toUser, activity)
-        recyclerview_chat_log.adapter = viewModel.ChatLogAdapter.value
-        recyclerview_chat_log.setHasFixedSize(true)
-        recyclerview_chat_log.setItemViewCacheSize(20)
-
-
+        viewModel.listenForMessages(toUser)
+        recyclerview_chat_log.adapter = viewModel.chatLogAdapter.value
+//        recyclerview_chat_log.setHasFixedSize(true)
+//        recyclerview_chat_log.setItemViewCacheSize(20)
 
         send_button_chat_log.setOnClickListener {
-//            Log.d("log", "attempt to send message...")
-            viewModel.performSendMessage(activity)
+            viewModel.performSendMessage()
         }
         image_select_button.setOnClickListener {
             imageSelecterStart()
         }
 
+        // 画像拡大表示
         UserPageViewModel.showImageData.observe(viewLifecycleOwner) { data ->
             if (data != null) {
                 changeToShowActivity(data.first, data.second)
             }
         }
-
-        chat_log_toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId)  {
-                android.R.id.home -> {
-                    viewModel.eventlistenerFinish()
-                    activity.onBackPressed()
-                }
-            }
-
-            return@setOnMenuItemClickListener false
-        }
-
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.imageSelectedFunction(data, activity)
+        viewModel.imageSelectedFunction(data)
     }
 
 
@@ -114,18 +100,17 @@ class ChatLogFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("log", "chat log is destroy")
-        viewModel.eventlistenerFinish()
+        viewModel.eventListenerFinish()
     }
 
 
-        @SuppressWarnings("unchecked")
+    // 画像拡大処理
+    @SuppressWarnings("unchecked")
     fun changeToShowActivity(imageView: View, imageUri: String) {
 
         imageView.visibility = View.VISIBLE
 
         val intent = Intent(activity, ShowActivity::class.java)
-//        Log.d("log", "imageuri: $imageUri")
         intent.putExtra(viewModel.IMAGE_SHOW, imageUri)
 
         val activityOptions: ActivityOptionsCompat =

@@ -47,15 +47,13 @@ class NewMessagesFragment : Fragment() {
             findNavController().navigate(R.id.action_NewMessages_to_LatestMessages)
         }
 
-
-
-        viewModel.NewMessageAdapter.value?.setOnItemClickListener { item, _ ->
+        viewModel.newMessageAdapter.value?.setOnItemClickListener { item, _ ->
             val user = (item as UserItem).user
             val action =
                 NewMessagesFragmentDirections.actionNewMessagesToChatLog(user)
             findNavController().navigate(action)
         }
-        recyclerview_newmessage.adapter = viewModel.NewMessageAdapter.value
+        recyclerview_newmessage.adapter = viewModel.newMessageAdapter.value
         recyclerview_newmessage.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
 
 
@@ -64,17 +62,13 @@ class NewMessagesFragment : Fragment() {
         new_message_toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
 
-                android.R.id.home -> {
-                    activity.onBackPressed()
-                }
-
                 R.id.add_friend -> {
                     val dialog = AlertDialog.Builder(activity, R.style.MyDialogTheme)
                     val view = View.inflate(activity, R.layout.dialog_input_friend_id, null)
                     dialog.setView(view)
                         .setPositiveButton("追加") { _, _ ->
                             val inputUid = view.findViewById<EditText>(R.id.input_friend_user_id_text).text.toString()
-                            viewModel.addFriendFunction(inputUid, activity)
+                            viewModel.addFriendFunction(inputUid)
                         }
                         .setNegativeButton("キャンセル", null)
                     val customDialog = dialog.create()
@@ -85,6 +79,7 @@ class NewMessagesFragment : Fragment() {
                 }
 
                 R.id.delete_friend -> {
+                    // フレンド名リスト作成
                     val friendNameList: Array<String> = viewModel.friendList.map {
                         it.userName
                     }.toTypedArray()
@@ -93,21 +88,18 @@ class NewMessagesFragment : Fragment() {
                     dialog.setTitle("削除するユーザーを選んでください")
                         .setMultiChoiceItems(friendNameList, null) { _, which, isChecked ->
                             if (isChecked) {
-//                            Log.d("log", "$which selected")
-//                            Log.d("log", "list: $deleteFriendNumber")
                                 deleteFriendNumber += which
                             } else if (deleteFriendNumber.contains(which)) {
                                 deleteFriendNumber.remove(which)
                             }
                         }
                         .setPositiveButton("削除") { _, _ ->
-//                        Log.d("log", "delete function: $deleteFriendNumber")
-                            viewModel.deleteFriendFunction(deleteFriendNumber, activity)
+                            viewModel.deleteFriendFunction(deleteFriendNumber)
                         }
                         .setNeutralButton("キャンセル", null)
                     val customDialog = dialog.create()
                     customDialog.show()
-                    // positive, negativeボタンの色指定
+                    // positive, neutralボタンの色指定
                     customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(activity.getColor(R.color.black))
                     customDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(activity.getColor(R.color.dialog_cancel))
                 }
@@ -115,15 +107,6 @@ class NewMessagesFragment : Fragment() {
 
             return@setOnMenuItemClickListener false
         }
-
-        viewModel.newMessagesPageEvent.observe(viewLifecycleOwner, EventObserver { destination ->
-            when(destination) {
-                "toChatLog" -> {
-
-                }
-            }
-        })
-
 
 
     }

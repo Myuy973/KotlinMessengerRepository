@@ -1,18 +1,13 @@
 package com.example.kotlinmessenger.viewModel
 
-import android.app.Activity
 import android.app.Application
+import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
-import androidx.annotation.MainThread
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.lifecycle.*
 import com.example.kotlinmessenger.R
@@ -29,7 +24,7 @@ import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import okhttp3.Dispatcher
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -37,18 +32,16 @@ class UserPageViewModel(
     private val myApplication: Application
 ) : AndroidViewModel(myApplication) {
 
-    val USER_KEY = "USER_KEY"
     val PROFILE_IMAGE_CHANGE = 2
     val IMAGE_SELECT = 1
     val IMAGE_SHOW = "IMAGE_SHOW"
 
     val latestLoadingValue = MutableLiveData<Int>(View.VISIBLE)
     val latestMessagePageEvent = MutableLiveData<Event<String>>()
-    val LatestMessagesAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
-    private var LatestOldList = mutableListOf<LatestMessageRow>()
+    val latestMessagesAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
+    private var latestOldList = mutableListOf<LatestMessageRow>()
     private val latestMessageMap = HashMap<String, ChatMessage>()
 
-    val showProfilePageEvent = MutableLiveData<Event<String>>()
     var updateProfileErrorList = mutableListOf<String>()
     lateinit var currentUserCopy: User
     lateinit var profileImageUri: Uri
@@ -60,17 +53,17 @@ class UserPageViewModel(
     val emailUpdateProcess = MutableLiveData<String>("")
     val editUserPassText = MutableLiveData<String>("")
     val passUpdateProcess = MutableLiveData<String>("")
+    val passEditTextEnableType = MutableLiveData<Boolean>(true)
+    val passEditTextHint = MutableLiveData<String>("")
     val updateButtonType = MutableLiveData<Boolean>(false)
     var updateAccessLimiter = false
-    val rogressbarType = MutableLiveData<Int>(View.GONE)
+    val progressBarType = MutableLiveData<Int>(View.GONE)
 
 
-    val newMessagesPageEvent = MutableLiveData<Event<String>>()
-    val NewMessageAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
+    val newMessageAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     var friendList = arrayOf<User>()
 
-    val chatLogPageEvent = MutableLiveData<Event<String>>()
-    val ChatLogAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
+    val chatLogAdapter = MutableLiveData<GroupieAdapter>(GroupieAdapter())
     val chatInputText = MutableLiveData<String>("")
     var scrollPosition = MutableLiveData<Int>(0)
     private lateinit var childEventListener: ChildEventListener
@@ -98,88 +91,71 @@ class UserPageViewModel(
 
     // --------------------- LatestMessage -------------------------------------------------
 
+    // firebaseにログインしているかどうか
     fun verifyUserIsLoggedIn(): Boolean {
-        // firebaseにログインしているかどうか
         val uid = FirebaseAuth.getInstance().uid
-        Log.d("log", "uid: $uid")
         if (uid == null) {
-//         activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             latestMessagePageEvent.value = Event("toRegister")
             return false
         }
         return true
     }
 
-     fun fetchCurrentUser() {
+    // ログインしているユーザーデータ取得
+    fun fetchCurrentUser() {
         val uid = Firebase.auth.currentUser?.uid
         FirebaseDatabase.getInstance().getReference("/users/$uid")
-                .addListenerForSingleValueEvent( object: ValueEventListener {
+            .addListenerForSingleValueEvent( object: ValueEventListener {
 
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        try {
-                            currentUser = snapshot.getValue(User::class.java)!!
-                            latestLoadingValue.value = View.GONE
-//                            Log.d("log", "latestLoadingValue: ${latestLoadingValue.value}")
-                        } catch (e: Exception) {
-//                            Log.d("log", "login user error: $e")
-                        }
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    try {
+                        currentUser = snapshot.getValue(User::class.java)!!
+                        latestLoadingValue.value = View.GONE
+                    } catch (e: Exception) {
+                        latestMessagePageEvent.value = Event("toRegister")
                     }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {}
-                })
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 
-
+    // 最新のやり取りをAdapterにセット
     private fun refreshRecyclerViewMessages(addOrChangeType: String, changePosition: Int = 0, key: String = "") {
         if (addOrChangeType == "Add") {
-            LatestMessagesAdapter.value?.clear()
-            LatestOldList.clear()
+            latestMessagesAdapter.value?.clear()
+            latestOldList.clear()
             latestMessageMap.values.forEach {
-                LatestOldList.add(LatestMessageRow(it, addOrChangeType))
-            }
-            try {
-                LatestMessagesAdapter.value?.update(LatestOldList)
-            } catch (e: java.lang.Exception) {
-//                Log.d("log", "error: ${e.message}")
+                latestOldList.add(LatestMessageRow(it, addOrChangeType))
             }
 
-        } else if (addOrChangeType == "Change") {
-            LatestOldList[changePosition] = LatestMessageRow(latestMessageMap[key]!!, addOrChangeType)
+            latestMessagesAdapter.value?.update(latestOldList)
 
-            try {
-                LatestMessagesAdapter.value?.update(LatestOldList)
-            } catch (e: java.lang.Exception) {
-//                Log.d("log", "error: ${e.message}")
-            }
+        } else if (addOrChangeType == "Change") { // 新規メッセージの場合はその部分だけ更新
+            latestOldList[changePosition] = LatestMessageRow(latestMessageMap[key]!!, addOrChangeType)
+
+            latestMessagesAdapter.value?.update(latestOldList)
         }
     }
 
-
+    // ログインしているユーザーの最新のやり取りを表示
     fun listenForLatestMessages() {
-//        Log.d("log", "latestLoadingValue2: ${latestLoadingValue.value}")
 
         val fromId = FirebaseAuth.getInstance().uid!!
         val ref = FirebaseDatabase.getInstance().getReference("latest-messages/$fromId")
         ref.addChildEventListener(object: ChildEventListener {
 
+            // すでに届いているメッセージ
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
 
-//                Log.d("listenForLatestMessages", "database add changed!!! : ${chatMessage.text}")
-//                Log.d("listenForLatestMessages", "snapshot changed!!! : ${snapshot}")
-
                 latestMessageMap[snapshot.key!!] = chatMessage
-
-//                Log.d("listenForLatestMessages", "latestMessageMap: ${latestMessageMap[snapshot.key]}, id: ${snapshot.key}")
-
                 refreshRecyclerViewMessages("Add")
             }
 
+            // 新着メッセージ
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val chatMessage = snapshot.getValue(ChatMessage::class.java) ?: return
-
-//                Log.d("listenForLatestMessages", "database onChildChanged!!!: ${chatMessage.text}")
 
                 latestMessageMap[snapshot.key!!] = chatMessage
                 var latestChangePosition = 0
@@ -202,6 +178,7 @@ class UserPageViewModel(
 
     // ------------------------------ showProfileActivity ------------------------------------------------------------
 
+    // LiveDataに値をセット
     fun userInfoDisplay(userImage: String = currentUser.profileImageUri,
                         userName: String = currentUser.userName,
                         userEmail: String = currentUser.userEmail) {
@@ -209,11 +186,25 @@ class UserPageViewModel(
         editUserNameText.value = userName
         editUserEmailText.value = userEmail
         editUserPassText.value = ""
-//        Log.d("log", "currentuser: ${currentUser.userName}, ${currentUser.userEmail}")
-//        Log.d("log", "edittext: ${editUserNameText.value}, ${editUserEmailText.value}")
+
+        if (currentUser.snsLoginType) {
+            passEditTextEnableType.value = false
+            passEditTextHint.value = myApplication.getString(R.string.pass_mismatch_sns_login)
+        } else {
+            passEditTextEnableType.value = true
+            passEditTextHint.value = myApplication.getString(R.string.pass_edittext_hint)
+        }
     }
 
-    fun setUpchuck() {
+
+    // 取得した画像データを表示
+    fun profileImageChange(data: Intent?, contentResolver: ContentResolver) {
+        profileImageUri = data?.data!!
+        bitmap.value = MediaStore.Images.Media.getBitmap(contentResolver, profileImageUri)
+    }
+
+    // 入力されるたびにチェック
+    fun setUpCheck() {
         listOf(editUserNameText, editUserEmailText, editUserPassText).forEach { liveData ->
             liveData.asFlow()
                     .onEach { inputTextCheck() }
@@ -221,29 +212,27 @@ class UserPageViewModel(
         }
     }
 
-    fun profileImageChange(data: Intent?, activity: Activity) {
-        profileImageUri = data?.data!!
-        bitmap.value = MediaStore.Images.Media.getBitmap(activity.contentResolver, profileImageUri)
-    }
-
+    // すべて入力されたら押下可
     private fun inputTextCheck() {
-        updateButtonType.value =
-                editUserEmailText.value?.isNotEmpty()!! &&
-                editUserEmailText.value?.isNotEmpty()!! &&
-                editUserPassText.value?.isNotEmpty()!!
+        if (currentUser.snsLoginType) {
+            updateButtonType.value =
+                    editUserEmailText.value?.isNotEmpty()!! &&
+                    editUserEmailText.value?.isNotEmpty()!!
+
+        } else {
+            updateButtonType.value =
+                    editUserEmailText.value?.isNotEmpty()!! &&
+                    editUserEmailText.value?.isNotEmpty()!! &&
+                    editUserPassText.value?.isNotEmpty()!!
+        }
     }
 
-    fun userProfileUpdate(loginType: Boolean) {
-
-        if (loginType) {
-            userPageToastText.value = "SNSログインの場合は編集できません"
-            return
-        }
+    // プロフィール更新処理
+    fun userProfileUpdate() {
 
         updateAccessLimiter = false
-        rogressbarType.value = View.VISIBLE
+        progressBarType.value = View.VISIBLE
 
-//        Log.d("log", "input Text: ${editUserNameText.value}, ${editUserEmailText.value}, ${editUserPassText.value}")
         updateProfileErrorList = mutableListOf()
 
         // 入力されたデータのチェック
@@ -256,13 +245,15 @@ class UserPageViewModel(
         }
         val passPattern = Regex("""^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,100}${'$'}""")
         if (!passPattern.matches(editUserPassText.value.toString())) {
-            updateProfileErrorList.add("パスワードが英数字8文字以上ではありません")
+            if (!currentUser.snsLoginType) {
+                updateProfileErrorList.add("パスワードが英数字8文字以上ではありません")
+            }
         }
 
         if (updateProfileErrorList.isNotEmpty()) {
             val errorMessage = updateProfileErrorList.joinToString(separator = "\n")
             userPageToastText.value = errorMessage
-            rogressbarType.value = View.GONE
+            progressBarType.value = View.GONE
             return
         }
 
@@ -271,8 +262,6 @@ class UserPageViewModel(
         val currentUserAuth = FirebaseAuth.getInstance().currentUser
         currentUserCopy = currentUser.copy()
 
-//        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
-//        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
 
         // user image
         if (bitmap.value != null) {
@@ -294,76 +283,60 @@ class UserPageViewModel(
 
         // userName
         if (editUserNameText.value != currentUser.userName) {
-//            Log.d("log", "name change")
             currentUserCopy.userName = editUserNameText.value!!
         }
 
         // userEmail
         if (editUserEmailText.value != currentUser.userEmail) {
-//            Log.d("log", "email change: ${editUserEmailText.value}")
             currentUserAuth?.updateEmail(editUserEmailText.value!!)
                     ?.addOnSuccessListener {
-//                        Log.d("log", "editUserEmailText value: ${editUserEmailText.value!!}")
-//                        Log.d("log", "email before value: ${currentUserCopy.userEmail}")
                         currentUserCopy.userEmail = editUserEmailText.value!!
-//                        Log.d("log", "email after value: ${currentUserCopy.userEmail}")
                         emailUpdateProcess.value = "ok"
                     }
                     ?.addOnFailureListener {
                         emailUpdateProcess.value = "error"
                         updateProfileErrorList.add(errorSetter(it.message!!))
-//                        Log.d("log", "email error : ${it.message}")
                     }
         } else { emailUpdateProcess.value = "ok" }
 
         // userPass
         if (editUserPassText.value != "") {
-//            Log.d("log", "pass change: ${editUserPassText.value}")
             currentUserAuth?.updatePassword(editUserPassText.value!!)
                     ?.addOnSuccessListener {
                         passUpdateProcess.value = "ok"
                     }
                     ?.addOnFailureListener {
-//                        Log.d("log", "pass change failed: ${Thread.currentThread().name}")
                         passUpdateProcess.value = "error"
                         updateProfileErrorList.add(errorSetter(it.message!!))
-//                        Log.d("log", "pass error : ${it.message}")
                     }
         } else { passUpdateProcess.value = "ok" }
 
 
     }
 
-    // 更新処理
-    suspend fun userdataUpdate(activity: Activity) {
+    // 非同期の更新が終わってからの処理
+    // 更新の内容をさらにデータベースへ保存など
+    suspend fun userdataUpdate() {
 
-//        Log.d("log", "userdataUpdate start")
-//        Log.d("log", "imageUpdateProcess: ${imageUpdateProcess.value}, emailUpdateProcess: ${emailUpdateProcess.value}, passUpdateProcess: ${passUpdateProcess.value}, updateAccessLimiter: ${updateAccessLimiter},  ")
         if (imageUpdateProcess.value == "" || emailUpdateProcess.value == "" || passUpdateProcess.value == "" || updateAccessLimiter) {
-//            Log.d("log", "userdataUpdate cancel")
             return
         }
-//        Log.d("log", "userdataUpdate check ok")
 
         updateAccessLimiter = true
 
         val ref = FirebaseDatabase.getInstance().getReference("users")
 
         // currentUserCopyのデータに変化があれば更新
-//        Log.d("log", "currentUserCopy : ${currentUserCopy.userName}, ${currentUserCopy.userEmail}")
-////        Log.d("log", "currentUser == currentUserCopy: ${currentUser == currentUserCopy}, currentUser === currentUserCopy : ${currentUser === currentUserCopy}")
         if (currentUser != currentUserCopy) {
-//            Log.d("log", "user change")
             ref.updateChildren(mapOf(currentUser.uid to currentUserCopy))
                     .addOnSuccessListener {
-//                        Log.d("log", "user change success")
                     }
         }
 
-//        Log.d("log", "errorlist ${updateProfileErrorList}")
         withContext(Dispatchers.Main) {
             if (updateProfileErrorList.isNotEmpty()) {
-                rogressbarType.value = View.GONE
+                progressBarType.value = View.GONE
+                // ２つとも同じエラーの場合、片方を表示
                 if (updateProfileErrorList[0] == updateProfileErrorList[1]) {
                     userPageToastText.value = updateProfileErrorList[0]
                     return@withContext
@@ -371,7 +344,7 @@ class UserPageViewModel(
                 val errorMessage = updateProfileErrorList.joinToString(separator = "\n")
                 userPageToastText.value = errorMessage
             } else {
-                rogressbarType.value = View.GONE
+                progressBarType.value = View.GONE
                 bitmap.value = null
                 imageUpdateProcess.value = ""
                 emailUpdateProcess.value = ""
@@ -396,30 +369,25 @@ class UserPageViewModel(
 
     // ------------------------------ NewMessageActivity ------------------------------------------------
 
+    // フレンドを表示
     fun fetchUserFriends() {
         friendList = arrayOf()
         val ref = FirebaseDatabase.getInstance().getReference("/user-friends/${currentUser.uid}")
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                NewMessageAdapter.value?.clear()
+                newMessageAdapter.value?.clear()
                 snapshot.children.forEach {
-//                    //                    Log.d("log", "current user: ${currentUser.uid}")
-////                    Log.d("log", "user: ${it.getValue(User::class.java)?.userName}")
                     class FriendUserUid(val uid: String = "")
 //                    val userUid = it.getValue(FriendUserUid::class.java)?.uid
-//                    Log.d("log", "friend : ${it.value}")
                     val userUid = it.value as Map<*, *>
-//                    Log.d("log", "friend : $userUid")
                     if (userUid["uid"] != currentUser.uid) {
 
                         val friendUserRef = FirebaseDatabase.getInstance().getReference("/users/${userUid["uid"]}")
                         friendUserRef.get().addOnSuccessListener { data ->
                             val friendUser = data.getValue(User::class.java)!!
                             friendList += friendUser
-                            NewMessageAdapter.value?.add(UserItem(friendUser))
-//                            Log.d("log", "add friendUser: ${friendUser.userName}")
-//                            Log.d("log", "friendlist: ${friendList.map { it.userName }}")
+                            newMessageAdapter.value?.add(UserItem(friendUser))
                         }
 
                     }
@@ -431,8 +399,8 @@ class UserPageViewModel(
         })
     }
 
-    fun addFriendFunction(friendUid: String, activity: Activity) {
-//        Log.d("log", "start addFriendFunction")
+    // フレンド追加処理
+    fun addFriendFunction(friendUid: String) {
 
         if (currentUser.uid == friendUid) {
             userPageToastText.value = "自分を追加することはできません"
@@ -461,18 +429,17 @@ class UserPageViewModel(
 
             } catch (e: java.lang.Exception) {
                 userPageToastText.value = "ユーザー追加に失敗しました"
-//                Log.d("log", "add friend error: ${e.printStackTrace()}")
             }
 
         }.addOnFailureListener {
                 userPageToastText.value = "ユーザー追加に失敗しました"
-//                Log.d("log", "add friend error: ${it.printStackTrace()}")
         }
 
 
     }
 
-    fun deleteFriendFunction(deleteList: List<Int>, activity: Activity) {
+    // フレンド削除処理
+    fun deleteFriendFunction(deleteList: List<Int>) {
 
         if (deleteList.isEmpty()) {
             userPageToastText.value = "削除するユーザーを選んでください"
@@ -506,7 +473,8 @@ class UserPageViewModel(
     // ------------------------ ChatLogActivity ---------------------------------------------------
 
 
-    fun listenForMessages(toUserData: User?, activity: Activity) {
+    // チャットログ表示
+    fun listenForMessages(toUserData: User?) {
         toUser = toUserData
         val fromId = FirebaseAuth.getInstance().uid!!
         val ref = FirebaseDatabase.getInstance()
@@ -518,37 +486,32 @@ class UserPageViewModel(
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-//                Log.d("log", "add start")
                 val chatMessage = snapshot.getValue(ChatMessage::class.java)
 
 
                 // alreadyReadへの既読処理
                 if (!chatMessage?.alreadyRead!!) {
-//                    Log.d("log", snapshot.key!!)
                     chatMessage.alreadyRead = true
                 }
 
-//                Log.d("log", chatMessage.text)
                 if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
                     val currentUser = currentUser
-                    ChatLogAdapter.value?.add(
+                    chatLogAdapter.value?.add(
                         ChatFromItem(chatMessage.imageUrl, chatMessage.text, currentUser)
                     )
                 } else {
-                    ChatLogAdapter.value?.add(
+                    chatLogAdapter.value?.add(
                         ChatToItem(chatMessage.imageUrl, chatMessage.text, toUser!!)
                     )
                 }
 
-//                Log.d("log", "fromId: $fromId")
-//                Log.d("log", "toUserId: ${toUser?.uid}")
 
                 // 既読したメッセージをデータベースへ保存
                 ref.updateChildren(mapOf(snapshot.key!! to chatMessage))
                 latestRef.updateChildren(mapOf(toUser?.uid to chatMessage))
 
-//                recyclerview_chat_log.scrollToPosition(ChatLogAdapter.value?.itemCount!! - 1)
-                scrollPosition.value = ChatLogAdapter.value?.itemCount!! - 1
+//                recyclerview_chat_log.scrollToPosition(chatLogAdapter.value?.itemCount!! - 1)
+                scrollPosition.value = chatLogAdapter.value?.itemCount!! - 1
 
             }
 
@@ -564,25 +527,21 @@ class UserPageViewModel(
 
     // addChildEventListenerデタッチ処理
     // そのままだとメッセージを読んでないのに既読になってしまう
-    fun eventlistenerFinish() {
+    fun eventListenerFinish() {
         val fromId = currentUser.uid
         val ref = FirebaseDatabase.getInstance()
             .getReference("user-messages/$fromId/${toUser?.uid}")
         try {
             ref.removeEventListener(childEventListener)
-//            Log.d("log", "finish success!!")
         } catch (e: java.lang.Exception) {
-//            Log.d("log", "error: ${e.message}")
         }
     }
 
-
-    fun performSendMessage(activity: Activity, imageUri: String = "") {
+    // メッセージ送信処理
+    fun performSendMessage(imageUri: String = "") {
 
         val notEmptyPattern = Regex(""".+""")
         val omitToSpace = chatInputText.value!!.filter { !Regex("""\s""").matches(it.toString()) }
-//        Log.d("log", "subText: [${omitToSpace}]")
-//        Log.d("log", "${!notEmptyPattern.matches(omitToSpace)}, ${omitToSpace.isEmpty()}, ${!imageSelectedType}")
         if ((!notEmptyPattern.matches(omitToSpace) || omitToSpace.isEmpty()) && !imageSelectedType) {
 
             userPageToastText.value = "テキストを入力してください"
@@ -595,29 +554,15 @@ class UserPageViewModel(
 
         val reference = FirebaseDatabase.getInstance().getReference("user-messages/$fromId/$toId").push()
         val toReference = FirebaseDatabase.getInstance().getReference("user-messages/$toId/$fromId").push()
-//        Log.d("log", "parameter set ok")
 
-//        Log.d("log", "${reference.key!!}, ${chatInputText.value!!}, ${fromId}, ${toId}, ${System.currentTimeMillis() / 1000}")
         // クラスにして送らないと送信できない(Activityも落ちる)
         val chatMessage = ChatMessage(reference.key!!, chatInputText.value!!, imageUri, fromId, toId, System.currentTimeMillis() / 1000, false)
         reference.setValue(chatMessage)
                 .addOnSuccessListener {
-//                    Log.d("log", "Saved our chat message to From: ${it}")
-//                    Log.d("log", "inputText: [${chatInputText.value}]")
-//                    Log.d("log", "inputText length: [${chatInputText.value!!.length}]")
                     chatInputText.value = ""
-////                Log.d("log", "inputText: ${chatInputText.value}")
-//                    recyclerview_chat_log.scrollToPosition(ChatLogAdapter.value?.itemCount!! - 1)
-                    try {
-                        scrollPosition.value = ChatLogAdapter.value?.itemCount!! - 1
-                    } catch (e: java.lang.Exception) {
-//                        Log.d("log", "error: ${e.printStackTrace()}")
-                    }
+                    scrollPosition.value = chatLogAdapter.value?.itemCount!! - 1
                 }
         toReference.setValue(chatMessage)
-                .addOnSuccessListener {
-//                    Log.d("log", "Saved our chat message to To: ${it}")
-                }
 
 
         val latestMessageRef = FirebaseDatabase.getInstance()
@@ -631,7 +576,8 @@ class UserPageViewModel(
     }
 
 
-    fun imageSelectedFunction(data: Intent?, activity: Activity) {
+    // 画像が選択された際の画像送信処理
+    fun imageSelectedFunction(data: Intent?) {
         imageSelectedType = true
         selectedImageUri = data?.data
 
@@ -640,8 +586,7 @@ class UserPageViewModel(
         ref.putFile(selectedImageUri!!)
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {
-//                        Log.d("log", "image uri: ${it}")
-                        performSendMessage(activity, it.toString())
+                        performSendMessage(it.toString())
                     }
                 }
     }

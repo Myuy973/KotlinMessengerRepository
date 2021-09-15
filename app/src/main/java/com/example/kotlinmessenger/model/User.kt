@@ -11,6 +11,7 @@ data class User(
     var uid: String,
     var userName: String,
     var userEmail: String,
-    var profileImageUri: String): Parcelable {
-    constructor(): this( "",  "", "", "")
+    var profileImageUri: String,
+    val snsLoginType: Boolean): Parcelable {
+    constructor(): this( "",  "", "", "", false)
 }

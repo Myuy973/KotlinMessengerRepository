@@ -3,15 +3,13 @@ package com.example.kotlinmessenger.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.kotlinmessenger.R
@@ -20,7 +18,6 @@ import com.example.kotlinmessenger.model.EventObserver
 import com.example.kotlinmessenger.viewModel.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import kotlinx.android.synthetic.main.fragment_login.*
-import kotlinx.android.synthetic.main.fragment_register.*
 
 class LoginFragment : Fragment() {
 
@@ -33,7 +30,7 @@ class LoginFragment : Fragment() {
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
         return binding.root
     }
@@ -94,7 +91,6 @@ class LoginFragment : Fragment() {
         val intent = viewModel.googleSignInClient.signInIntent
         val requestCode = viewModel.GOOGLE_SIGNIN
         startActivityForResult(intent, requestCode)
-        //        startActivityForResultFunction = googleSigninFunction
     }
 
     private fun hideKeyboard() {

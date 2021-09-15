@@ -10,12 +10,12 @@
 
     <item
         android:id="@+id/user_profile"
-        android:title="User Profile"
+        android:title="プロフィール"
         app:showAsAction="never" />
     <item
 
         android:id="@+id/menu_sign_out"
-        android:title="Sign Out"
+        android:title="ログアウト"
         app:showAsAction="never" />
 
 

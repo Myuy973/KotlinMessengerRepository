@@ -18,7 +18,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
@@ -62,16 +61,11 @@ class LoginViewModel(
     // ------------------- google signin ----------------------------------------------
 
     lateinit var googleSignInClient: GoogleSignInClient
-    private var auth: FirebaseAuth
-
-    var requestCode: Int = 0
-    lateinit var startActivityForResultIntent: Intent
+    private var auth: FirebaseAuth = Firebase.auth
 
     var buttonAlpha = MutableLiveData<Float>(1f)
     private var selectedPhotoUri: Uri? = null
     var bitmap = MutableLiveData<Bitmap?>(null)
-
-    private val provider: OAuthProvider.Builder = OAuthProvider.newBuilder("twitter.com")
 
     val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("693890654310-4h5vpi1psul17adjt04cmqdsit9tpb8g.apps.googleusercontent.com")
@@ -84,13 +78,8 @@ class LoginViewModel(
         val loginToastText = MutableLiveData<String>("")
     }
 
-
-
     init {
 
-//        Log.d("log", "start Login view model")
-
-        auth = Firebase.auth
         progressbarType.value = View.GONE
 
         // それぞれ変更されたら全項目が入力済みかチェック
@@ -108,6 +97,7 @@ class LoginViewModel(
 
     }
 
+    // それぞれの入力内容をチェック(Register)
     private fun checkSigninItem() {
 
         if (!userName.value?.isEmpty()!!) {
@@ -137,18 +127,17 @@ class LoginViewModel(
                 !userName.value?.isEmpty()!! &&
                 !userEmail.value?.isEmpty()!! &&
                 !userPassword.value?.isEmpty()!!
-//        Log.d("log", "name: ${userName.value}, email: ${userEmail.value}, pass: ${userPassword.value}")
-//        Log.d("log", "signinButtonType: ${signinButtonType.value}")
 
     }
 
+    // それぞれの入力内容をチェック(Login)
     private fun checkLoginItem() {
 
         val emailPattern = Regex("""[a-zA-Z0-9._-]+@[a-z]+\.+[a-z]+""")
         if (emailPattern.matches(loginUserEmail.value.toString())) {
             loginErrorMessage.remove(myApplication.getString(R.string.email_input_error))
         } else if (!loginErrorMessage.contains(myApplication.getString(R.string.email_input_error))) {
-            loginErrorMessage.add(myApplication.getString(R.string.email_input_error)!!)
+            loginErrorMessage.add(myApplication.getString(R.string.email_input_error))
         }
 
 
@@ -159,7 +148,6 @@ class LoginViewModel(
             loginErrorMessage.add(myApplication.getString(R.string.pass_mismatch))
         }
 
-//        Log.d("log", "$loginErrorMessage")
 
 
         loginButtonType.value =
@@ -171,19 +159,21 @@ class LoginViewModel(
 
     // ----------------- common Signin Function -------------------------------------------
 
+    // 作成したユーザーデータをデータベースへ保存
+    // LatestMessageへ移動
     private fun saveUserToFirebaseDatabase(profileImageUri: String,
                                            userName: String,
                                            userEmail: String,
                                            snsLogin: Boolean,
                                            fromFragment: String) {
 
+
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = Firebase.database.getReference("users/$uid")
 
-        val user = User(uid, userName, userEmail,  profileImageUri)
+        val user = User(uid, userName, userEmail,  profileImageUri, snsLogin)
 
         ref.setValue(user).addOnSuccessListener {
-//            toastPrint("ようこそ ${user.userName}さん", activityName)
             loginToastText.value = "ようこそ ${user.userName}さん"
             progressbarType.value = View.GONE
 
@@ -192,25 +182,41 @@ class LoginViewModel(
                 "Login" -> loginPageEvent.value = event
                 "Register" -> registerPageEvent.value = event
             }
-//            Log.d("log", "Finally we saved the user to Firebase Database")
-//            Log.d("log", "snsLogin: $snsLogin")
-//            val intent = Intent(activity, LatestMessagesActivity::class.java)
-//            intent.putExtra("fromActivity", "SigninOrLogin")
-//            intent.putExtra("snsLogin", snsLogin)
-//            // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//            activity.startActivity(intent)
         }.addOnFailureListener {
             progressbarType.value = View.GONE
             loginToastText.value = "ログインに失敗しました"
         }
     }
 
+    //------------------- common Login Function -------------------------------------------------
+
+    private fun loginFunction(uid: String, fromFragment: String, userName: String = "") {
+        var name = userName
+
+        if (userName == "") {
+            val ref = FirebaseDatabase.getInstance().getReference("users/${uid}")
+            ref.get().addOnSuccessListener {
+                name = it.getValue(User::class.java)?.userName!!
+                loginToastText.value = "ようこそ ${name}さん"
+            }
+        } else {
+                loginToastText.value = "ようこそ ${name}さん"
+        }
+
+        progressbarType.value = View.GONE
+        if (fromFragment == "Register") {
+            registerPageEvent.value = Event("enter")
+        } else {
+            loginPageEvent.value = Event("enter")
+        }
+    }
+
+
     //------------------ Email Signin --------------------------------
 
+    // 選択された画像を表示
     fun imageSetFunction(data: Intent?, activity: Activity) {
         selectedPhotoUri = data?.data
-//        Log.d("log", "bitmap: ${bitmap.value ?: "null"}")
         bitmap.value = MediaStore.Images.Media.getBitmap(activity.contentResolver, selectedPhotoUri)
 
         buttonAlpha.value = 0f
@@ -218,15 +224,13 @@ class LoginViewModel(
         userImage.value = true
     }
 
-
-
+    // SignIn, Login処理開始
     fun performRegister(fragmentName: String) {
 
         progressbarType.value = View.VISIBLE
         var email = ""
         var pass = ""
 
-        Log.d("log", "performRegister start: $fragmentName")
 
         when (fragmentName) {
             "Register" -> {
@@ -235,9 +239,7 @@ class LoginViewModel(
                 if (signErrorMessage.isNotEmpty()) {
                     progressbarType.value = View.GONE
                     val error = signErrorMessage.joinToString(separator = "\n")
-//                    toastPrint(error, ".view.RegisterActivity")
                     loginToastText.value = error
-//                    Log.d("log", error)
                     return
                 }
             }
@@ -247,9 +249,7 @@ class LoginViewModel(
                 if (loginErrorMessage.isNotEmpty()) {
                     progressbarType.value = View.GONE
                     val error = loginErrorMessage.joinToString(separator = "\n")
-//                    toastPrint(error, ".view.LoginActivity")
                     loginToastText.value = error
-//                    Log.d("log", error)
                     return
                 }
             }
@@ -258,47 +258,29 @@ class LoginViewModel(
 
         when (fragmentName) {
             "Register" -> {
-//                Log.d("log", "register activity")
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass)
                         .addOnCompleteListener {
                             if (!it.isSuccessful) return@addOnCompleteListener
-//                            toastPrint("Login Successfully", activity)
                             uploadImageToFirebaseStorage(email)
                         }
                         .addOnFailureListener {
                             progressbarType.value = View.GONE
-//                            Log.d("log", "error: ${it.message}")
-//                            toastPrint("ユーザー作成に失敗しました。", activity)
                             loginToastText.value = "ユーザー作成に失敗しました"
                         }
             }
             "Login" -> {
-//                Log.d("log", "loginActivity")
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
                         .addOnSuccessListener { data ->
-
-                            val ref = FirebaseDatabase.getInstance().getReference("users/${data.user?.uid}")
-                            ref.get().addOnSuccessListener {
-                                val user = it.getValue(User::class.java)
-//                                toastPrint("ようこそ ${user?.userName}", activity)
-                                loginToastText.value = "ようこそ ${user?.userName}"
-                            }
-
-                            progressbarType.value = View.GONE
-                            loginPageEvent.value = Event("enter")
-//                            // activityのバックスタックを消し、新しくバックスタックを作り直す（戻るを押すとアプリが落ちる）
+                            loginFunction(data.user?.uid!!, fragmentName)
                         }
                         .addOnFailureListener {
-//                            Log.d("log", "Failed to login: ${it.message}")
                             progressbarType.value = View.GONE
                             when (it.message!!) {
                                 myApplication.getString(R.string.login_error1),
                                 myApplication.getString(R.string.login_error2) -> {
-//                                    toastPrint("メールアドレスまたはパスワードが違います。", activity)
                                     loginToastText.value = "メールアドレスまたはパスワードが違います"
                                 }
                                 myApplication.getString(R.string.login_error3) -> {
-//                                    toastPrint("規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。", activity)
                                     loginToastText.value = "規定回数ログインに失敗しましたので、時間をおいて再度ログインしてください。"
                                 }
 
@@ -308,33 +290,51 @@ class LoginViewModel(
         }
     }
 
+    // 選択された画像をFirebaseStorageへ保存
     private fun uploadImageToFirebaseStorage(userEmail: String) {
         if (selectedPhotoUri == null) return
 
-//        Log.d("log", "uploadImageToFirebaseStorage start")
         // 一意の文字列
         val filename = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
         ref.putFile(selectedPhotoUri!!)
             .addOnSuccessListener {
-//                Log.d("log", "successfully uploaded image")
                 ref.downloadUrl.addOnSuccessListener {
                     saveUserToFirebaseDatabase(it.toString(), userName.value!!, userEmail, false, "Register")
                 }
             }
             .addOnFailureListener { e ->
                 progressbarType.value = View.GONE
-//                Log.d("log", "error: ${e.printStackTrace()}")
+            }
+    }
+
+    //-------------------- SNS Login -----------------------------------------
+
+    private fun loginOrSignInCheck(userUid: String,
+                                   fromFragment: String,
+                                   profileImageUri: String,
+                                   userName: String,
+                                   userEmail: String,
+    ) {
+        val snsRef = FirebaseDatabase.getInstance().getReference("users/$userUid")
+        snsRef.get()
+            .addOnSuccessListener {
+                if (it.getValue(User::class.java) != null) {
+                    loginFunction(userUid, fromFragment)
+                } else {
+                    saveUserToFirebaseDatabase(profileImageUri, userName, userEmail, true, fromFragment)
+                }
+            }
+            .addOnFailureListener {
+                loginToastText.value = "failed : ${it.message}"
+                progressbarType.value = View.GONE
             }
     }
 
 
-
-
-
     //------------------ Google Signin --------------------------------
 
-
+    // googleからのSignIn開始
     fun googleSigninFunction(data: Intent?, fromFragment: String, activity: Activity) {
         progressbarType.value = View.VISIBLE
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
@@ -346,20 +346,19 @@ class LoginViewModel(
         }
     }
 
+    // googleアカウントからユーザーデータ取得
     private fun firebaseAuthWithGoogle(idToken: String, fromFragment: String, activity: Activity) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(activity) { task ->
                     if (task.isSuccessful) {
-                        val name = auth.currentUser?.displayName
-                        val email = auth.currentUser?.email
-                        val photourl = auth.currentUser?.photoUrl
-//                        Log.d("log", "google signin success : name: $name, email: $email, photourl: $photourl")
-                        saveUserToFirebaseDatabase(photourl!!.toString(), name!!, email!!, true, fromFragment)
+                        val uid = auth.currentUser?.uid!!
+                        val name = auth.currentUser?.displayName!!
+                        val email = auth.currentUser?.email!!
+                        val photoURL = auth.currentUser?.photoUrl.toString()
+                        loginOrSignInCheck(uid, fromFragment, photoURL, name, email)
                     } else {
                         loginToastText.value = "firebaseAuthWithGoogle error: ${task.exception}"
-//                        toastPrint("firebaseAuthWithGoogle error: ${task.exception}", activity)
-//                        Log.d("log", "firebaseAuthWithGoogle error: ${task.exception}")
                     }
                 }
     }

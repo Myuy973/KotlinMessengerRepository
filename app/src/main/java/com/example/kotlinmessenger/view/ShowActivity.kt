@@ -1,6 +1,5 @@
 package com.example.kotlinmessenger.view
 
-import android.app.Application
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -22,13 +21,10 @@ class ShowActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_show)
 
         val imageUri = intent.getStringExtra(UserPageViewModel(application).IMAGE_SHOW) ?: ""
-//        Log.d("log", "show Activity imageuri: $imageUri")
 
         ViewCompat.setTransitionName(show_image_preview, VIEW_NAME_HEADER_IMAGE)
         val uri = Uri.parse(imageUri)
         Picasso.get().load(uri).into(show_image_preview)
-//        show_image_preview.setImageURI(uri)
-//        Log.d("log", "show Activity visibility : ${show_image_preview.visibility}")
 
         show_activity_container.setOnClickListener { onBackPressed() }
 

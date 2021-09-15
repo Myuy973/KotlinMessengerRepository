@@ -1,19 +1,18 @@
 package com.example.kotlinmessenger.view
 
 import android.app.Activity
-import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asFlow
 import androidx.navigation.fragment.findNavController
@@ -33,7 +32,6 @@ class ShowProfileFragment : Fragment() {
     private var _binding: FragmentShowProfileBinding? = null
     private val binding get() = _binding!!
     private val viewModel: UserPageViewModel by viewModels()
-    private val args: ShowProfileFragmentArgs by navArgs()
     private lateinit var activity: AppCompatActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +44,7 @@ class ShowProfileFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_show_profile, container, false)
         return binding.root
     }
@@ -58,6 +56,7 @@ class ShowProfileFragment : Fragment() {
         show_profile_toolbar.title = activity.getString(R.string.show_profile_title)
         show_profile_toolbar.navigationIcon = resources.getDrawable(R.drawable.ic_small_back_button)
         show_profile_toolbar.setNavigationOnClickListener {
+            (activity as MessengerActivity).hideKeyboard()
             findNavController().navigate(R.id.action_ShowProfile_to_LatestMessages)
         }
 
@@ -66,7 +65,7 @@ class ShowProfileFragment : Fragment() {
         binding.lifecycleOwner = activity
 
         // editUserNameText, editUserEmailText, editUserPassText チェッカー起動
-        viewModel.setUpchuck()
+        viewModel.setUpCheck()
 
         // ユーザー情報をLiveDataへ
         viewModel.userInfoDisplay()
@@ -92,15 +91,14 @@ class ShowProfileFragment : Fragment() {
         }
 
 
-        val snsLogin = args.snsLoginType
-        updataToProfileButton.setOnClickListener { viewModel.userProfileUpdate(snsLogin) }
+        updataToProfileButton.setOnClickListener { viewModel.userProfileUpdate() }
 
         // email, pass, imageそれぞれの更新処理が終わっているかチェック
         listOf( viewModel.emailUpdateProcess,
                 viewModel.passUpdateProcess,
                 viewModel.imageUpdateProcess).forEach { liveData ->
                     liveData.asFlow()
-                        .onEach { viewModel.userdataUpdate(activity) }
+                        .onEach { viewModel.userdataUpdate() }
                         .launchIn(GlobalScope)
         }
 
@@ -128,7 +126,7 @@ class ShowProfileFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == viewModel.PROFILE_IMAGE_CHANGE && resultCode == Activity.RESULT_OK) {
-            viewModel.profileImageChange(data, activity)
+            viewModel.profileImageChange(data, activity.contentResolver)
         }
     }
 

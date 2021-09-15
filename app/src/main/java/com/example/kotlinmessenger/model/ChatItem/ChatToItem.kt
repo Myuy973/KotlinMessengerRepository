@@ -12,22 +12,23 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.databinding.BindableItem
 
-class ChatToItem(val imageUri: String, val text: String, val user: User): BindableItem<ChatToRowBinding>() {
+class ChatToItem(private val imageUri: String, val text: String, val user: User): BindableItem<ChatToRowBinding>() {
     override fun bind(viewBinding: ChatToRowBinding, position: Int) {
 
-        if (imageUri == "") {
+        if (imageUri == "") {  // 画像がない場合
 
             viewBinding.sendImage.visibility = View.GONE
 
             viewBinding.textView.text = text
             val uri = Uri.parse(user.profileImageUri)
             val userImageView = viewBinding.imageviewChatToRow
-//            userImageView.setImageURI(uri)
             Picasso.get().load(uri)
                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                 .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                 .into(userImageView)
-        } else {
+
+        } else {   // 画像がある場合
+
             if (text == "") {
                 viewBinding.textView.visibility = View.GONE
             } else {
@@ -36,9 +37,9 @@ class ChatToItem(val imageUri: String, val text: String, val user: User): Bindab
                 viewBinding.textView.setBackgroundResource(R.drawable.image_description_text)
             }
 
+            // 送信画像
             val sendImageUri = Uri.parse(imageUri)
             val sendImageView = viewBinding.sendImage
-//            sendImageView.setImageURI(sendImageUri)
             Picasso.get().load(sendImageUri)
                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                 .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
@@ -50,9 +51,9 @@ class ChatToItem(val imageUri: String, val text: String, val user: User): Bindab
                 UserPageViewModel.showImageData.value = Pair(sendImageView, imageUri)
             }
 
+            // ユーザーイメージ画像
             val uri = Uri.parse(user.profileImageUri)
             val userImageView = viewBinding.imageviewChatToRow
-//            userImageView.setImageURI(uri)
             Picasso.get().load(uri)
                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                 .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
