@@ -12,8 +12,8 @@ import androidx.core.util.Pair
 import androidx.lifecycle.*
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.model.*
-import com.example.kotlinmessenger.model.ChatItem.ChatFromItem
-import com.example.kotlinmessenger.model.ChatItem.ChatToItem
+import com.example.kotlinmessenger.model.chatItem.ChatFromItem
+import com.example.kotlinmessenger.model.chatItem.ChatToItem
 import com.example.kotlinmessenger.view.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth

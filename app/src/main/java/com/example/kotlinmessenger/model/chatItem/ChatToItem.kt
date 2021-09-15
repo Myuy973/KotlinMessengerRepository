@@ -1,9 +1,10 @@
-package com.example.kotlinmessenger.model.ChatItem
+package com.example.kotlinmessenger.model.chatItem
 
 import android.net.Uri
 import android.view.View
+import androidx.core.util.Pair
 import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.ChatFromRowBinding
+import com.example.kotlinmessenger.databinding.ChatToRowBinding
 import com.example.kotlinmessenger.model.User
 import com.example.kotlinmessenger.viewModel.UserPageViewModel
 import com.squareup.picasso.MemoryPolicy
@@ -11,8 +12,8 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.databinding.BindableItem
 
-class ChatFromItem(private val imageUri: String, val text: String, val user: User): BindableItem<ChatFromRowBinding>() {
-    override fun bind(viewBinding: ChatFromRowBinding, position: Int) {
+class ChatToItem(private val imageUri: String, val text: String, val user: User): BindableItem<ChatToRowBinding>() {
+    override fun bind(viewBinding: ChatToRowBinding, position: Int) {
 
         if (imageUri == "") {  // 画像がない場合
 
@@ -20,14 +21,13 @@ class ChatFromItem(private val imageUri: String, val text: String, val user: Use
 
             viewBinding.textView.text = text
             val uri = Uri.parse(user.profileImageUri)
-            val userImageView = viewBinding.imageviewChatFromRow
-
+            val userImageView = viewBinding.imageviewChatToRow
             Picasso.get().load(uri)
                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                 .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                 .into(userImageView)
 
-        } else {  // 画像がある場合
+        } else {   // 画像がある場合
 
             if (text == "") {
                 viewBinding.textView.visibility = View.GONE
@@ -48,24 +48,21 @@ class ChatFromItem(private val imageUri: String, val text: String, val user: Use
             sendImageView.visibility = View.VISIBLE
 
             sendImageView.setOnClickListener {
-                UserPageViewModel.showImage(sendImageView, imageUri)
+                UserPageViewModel.showImageData.value = Pair(sendImageView, imageUri)
             }
 
             // ユーザーイメージ画像
             val uri = Uri.parse(user.profileImageUri)
-            val userImageView = viewBinding.imageviewChatFromRow
-
+            val userImageView = viewBinding.imageviewChatToRow
             Picasso.get().load(uri)
                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                 .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                 .into(userImageView)
-
         }
-
     }
 
     override fun getLayout(): Int {
-        return R.layout.chat_from_row
+        return R.layout.chat_to_row
     }
 
 }

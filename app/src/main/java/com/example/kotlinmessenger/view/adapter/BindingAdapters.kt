@@ -1,11 +1,8 @@
-package com.example.kotlinmessenger.view.Adapter
+package com.example.kotlinmessenger.view.adapter
 
 import android.graphics.Bitmap
-import android.util.Log
-import android.view.View
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kotlinmessenger.R
 import de.hdodenhof.circleimageview.CircleImageView
 
 object BindingAdapters {
