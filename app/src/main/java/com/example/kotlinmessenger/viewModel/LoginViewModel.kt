@@ -2,6 +2,7 @@ package com.example.kotlinmessenger.viewModel
 
 import android.app.Activity
 import android.app.Application
+import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -215,9 +216,9 @@ class LoginViewModel(
     //------------------ Email Signin --------------------------------
 
     // 選択された画像を表示
-    fun imageSetFunction(data: Intent?, activity: Activity) {
+    fun imageSetFunction(data: Intent?, contentResolver: ContentResolver) {
         selectedPhotoUri = data?.data
-        bitmap.value = MediaStore.Images.Media.getBitmap(activity.contentResolver, selectedPhotoUri)
+        bitmap.value = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
 
         buttonAlpha.value = 0f
 

@@ -86,7 +86,7 @@ class RegisterFragment : Fragment() {
 
         if (requestCode == viewModel.IMAGE_INPUT && resultCode == Activity.RESULT_OK && data != null) {
 
-            viewModel.imageSetFunction(data, activity)
+            viewModel.imageSetFunction(data, activity.contentResolver)
 
         } else if (requestCode == viewModel.GOOGLE_SIGNIN) {
 
