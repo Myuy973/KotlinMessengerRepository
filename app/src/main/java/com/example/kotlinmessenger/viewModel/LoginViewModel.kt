@@ -343,7 +343,7 @@ class LoginViewModel(
             val account = task.getResult(ApiException::class.java)!!
             firebaseAuthWithGoogle(account.idToken!!, fromFragment,  activity)
         } catch (e: Exception) {
-            loginToastText.value = "onActivityResult error: ${e.printStackTrace()}"
+            progressbarType.value = View.GONE
         }
     }
 
@@ -360,6 +360,7 @@ class LoginViewModel(
                         loginOrSignInCheck(uid, fromFragment, photoURL, name, email)
                     } else {
                         loginToastText.value = "firebaseAuthWithGoogle error: ${task.exception}"
+                        progressbarType.value = View.GONE
                     }
                 }
     }
