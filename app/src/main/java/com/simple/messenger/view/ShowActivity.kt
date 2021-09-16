@@ -1,13 +1,13 @@
-package com.example.kotlinmessenger.view
+package com.simple.messenger.view
 
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.ActivityShowBinding
-import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.simple.messenger.R
+import com.simple.messenger.databinding.ActivityShowBinding
+import com.simple.messenger.viewModel.UserPageViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show.*
 

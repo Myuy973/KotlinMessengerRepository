@@ -1,11 +1,11 @@
-package com.example.kotlinmessenger.model
+package com.simple.messenger.model
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Color
 import android.view.View
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.LatestMessageRowBinding
+import com.simple.messenger.R
+import com.simple.messenger.databinding.LatestMessageRowBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

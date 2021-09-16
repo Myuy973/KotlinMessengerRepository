@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.view
+package com.simple.messenger.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,11 +11,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.FragmentLatestMessagesBinding
-import com.example.kotlinmessenger.model.EventObserver
-import com.example.kotlinmessenger.model.LatestMessageRow
-import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.simple.messenger.R
+import com.simple.messenger.databinding.FragmentLatestMessagesBinding
+import com.simple.messenger.model.EventObserver
+import com.simple.messenger.model.LatestMessageRow
+import com.simple.messenger.viewModel.UserPageViewModel
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.fragment_latest_messages.*
 import kotlinx.android.synthetic.main.latest_message_row.view.*

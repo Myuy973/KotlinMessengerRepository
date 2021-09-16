@@ -1,13 +1,13 @@
-package com.example.kotlinmessenger.view
+package com.simple.messenger.view
 
 import android.content.Context
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.kotlinmessenger.databinding.ActivityMessengerBinding
-import com.example.kotlinmessenger.viewModel.LoginViewModel
-import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.simple.messenger.databinding.ActivityMessengerBinding
+import com.simple.messenger.viewModel.LoginViewModel
+import com.simple.messenger.viewModel.UserPageViewModel
 
 class MessengerActivity : AppCompatActivity() {
 

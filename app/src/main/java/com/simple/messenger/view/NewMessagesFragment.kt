@@ -1,7 +1,6 @@
-package com.example.kotlinmessenger.view
+package com.simple.messenger.view
 
 import android.app.AlertDialog
-import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,11 +12,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.FragmentNewMessagesBinding
-import com.example.kotlinmessenger.model.EventObserver
-import com.example.kotlinmessenger.model.UserItem
-import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.simple.messenger.R
+import com.simple.messenger.databinding.FragmentNewMessagesBinding
+import com.simple.messenger.model.UserItem
+import com.simple.messenger.viewModel.UserPageViewModel
 import kotlinx.android.synthetic.main.fragment_chat_log.*
 import kotlinx.android.synthetic.main.fragment_new_messages.*
 

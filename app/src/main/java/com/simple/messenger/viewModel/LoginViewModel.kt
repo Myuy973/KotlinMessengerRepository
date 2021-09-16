@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.viewModel
+package com.simple.messenger.viewModel
 
 import android.app.Activity
 import android.app.Application
@@ -7,12 +7,11 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.model.Event
-import com.example.kotlinmessenger.model.User
+import com.simple.messenger.R
+import com.simple.messenger.model.Event
+import com.simple.messenger.model.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

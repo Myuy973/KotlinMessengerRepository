@@ -1,7 +1,7 @@
-package com.example.kotlinmessenger.model
+package com.simple.messenger.model
 
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.UserRowNewMessageBinding
+import com.simple.messenger.R
+import com.simple.messenger.databinding.UserRowNewMessageBinding
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.databinding.BindableItem
 

@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.model
+package com.simple.messenger.model
 
 class ChatMessage(val id: String,
                   val text: String,

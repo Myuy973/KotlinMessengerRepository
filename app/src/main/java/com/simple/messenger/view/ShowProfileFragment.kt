@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.view
+package com.simple.messenger.view
 
 import android.app.Activity
 import android.content.ClipData
@@ -16,10 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asFlow
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.FragmentShowProfileBinding
-import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.simple.messenger.R
+import com.simple.messenger.databinding.FragmentShowProfileBinding
+import com.simple.messenger.viewModel.UserPageViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_chat_log.*
 import kotlinx.android.synthetic.main.fragment_show_profile.*

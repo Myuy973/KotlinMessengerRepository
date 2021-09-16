@@ -1,8 +1,8 @@
-package com.example.kotlinmessenger.view
+package com.simple.messenger.view
 
 import android.content.Intent
+import com.simple.messenger.model.User
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.databinding.FragmentChatLogBinding
-import com.example.kotlinmessenger.viewModel.UserPageViewModel
+import com.simple.messenger.R
+import com.simple.messenger.databinding.FragmentChatLogBinding
+import com.simple.messenger.viewModel.UserPageViewModel
 import kotlinx.android.synthetic.main.fragment_chat_log.*
 
 
@@ -28,7 +28,7 @@ class ChatLogFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: UserPageViewModel by viewModels()
     private lateinit var activity: AppCompatActivity
-    private lateinit var toUser: com.example.kotlinmessenger.model.User
+    private lateinit var toUser: User
     private val args: ChatLogFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +54,12 @@ class ChatLogFragment : Fragment() {
         binding.lifecycleOwner = activity
 
 
+        // User dataがなかった場合 Fragmentを閉じる
+        if (args.partnerUser == null) {
+            onDestroy()
+        }
         // チャット相手の取得、タイトルにセット
-        toUser = args.partnerUser
+        toUser = args.partnerUser!!
         chat_log_toolbar.title = toUser.userName
         chat_log_toolbar.navigationIcon = resources.getDrawable(R.drawable.ic_small_back_button)
         chat_log_toolbar.setNavigationOnClickListener {

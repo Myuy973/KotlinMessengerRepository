@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.view.adapter
+package com.simple.messenger.view.adapter
 
 import android.graphics.Bitmap
 import androidx.databinding.BindingAdapter

@@ -20,7 +20,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.kotlinmessenger"
+        applicationId "com.simple.messenger"
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1

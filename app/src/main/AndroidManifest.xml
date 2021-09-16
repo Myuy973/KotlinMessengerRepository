@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.kotlinmessenger">
+    package="com.simple.messenger">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,7 +14,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".view.MessengerActivity"
+            android:name="com.simple.messenger.view.MessengerActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:windowSoftInputMode="adjustResize">
 
@@ -26,7 +26,7 @@
         </activity>
 
         <activity
-            android:name=".view.ShowActivity"
+            android:name="com.simple.messenger.view.ShowActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
