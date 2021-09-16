@@ -82,9 +82,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:693890654310:android:cb2d079a29599ce44a4da7",
+        "mobilesdk_app_id": "1:693890654310:android:7562e206a74a2ada4a4da7",
         "android_client_info": {
-          "package_name": "com.simple.messenger"
+          "package_name": "com.simple.friendship_messenger"
         }
       },
       "oauth_client": [

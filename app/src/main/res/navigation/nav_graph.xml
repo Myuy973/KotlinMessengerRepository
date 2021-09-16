@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/RegisterFragment"
-        android:name="com.simple.messenger.view.RegisterFragment"
+        android:name="com.simple.friendship_messenger.view.RegisterFragment"
         android:label="@string/register_fragment_label"
         tools:layout="@layout/fragment_register">
         <action
@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/LoginFragment"
-        android:name="com.simple.messenger.view.LoginFragment"
+        android:name="com.simple.friendship_messenger.view.LoginFragment"
         android:label="@string/login_fragment_label"
         tools:layout="@layout/fragment_login">
         <action
@@ -41,7 +41,7 @@
 
     <fragment
         android:id="@+id/ShowProfileFragment"
-        android:name="com.simple.messenger.view.ShowProfileFragment"
+        android:name="com.simple.friendship_messenger.view.ShowProfileFragment"
         android:label="@string/show_profile_fragment_label"
         tools:layout="@layout/fragment_show_profile">
         <action
@@ -53,7 +53,7 @@
 
     <fragment
         android:id="@+id/LatestMessagesFragment"
-        android:name="com.simple.messenger.view.LatestMessagesFragment"
+        android:name="com.simple.friendship_messenger.view.LatestMessagesFragment"
         android:label="@string/latest_messages_fragment_label"
         tools:layout="@layout/fragment_latest_messages">
         <action
@@ -83,7 +83,7 @@
     </fragment>
     <fragment
         android:id="@+id/NewMessagesFragment"
-        android:name="com.simple.messenger.view.NewMessagesFragment"
+        android:name="com.simple.friendship_messenger.view.NewMessagesFragment"
         android:label="@string/new_messages_fragment_label"
         tools:layout="@layout/fragment_new_messages">
         <action
@@ -99,12 +99,12 @@
     </fragment>
     <fragment
         android:id="@+id/ChatLogFragment"
-        android:name="com.simple.messenger.view.ChatLogFragment"
+        android:name="com.simple.friendship_messenger.view.ChatLogFragment"
         android:label="@string/chat_log_fragment_label"
         tools:layout="@layout/fragment_chat_log">
         <argument
             android:name="partner_user"
-            app:argType="com.simple.messenger.model.User"
+            app:argType="com.simple.friendship_messenger.model.User"
             app:nullable="true"
             android:defaultValue="@null" />
         <action

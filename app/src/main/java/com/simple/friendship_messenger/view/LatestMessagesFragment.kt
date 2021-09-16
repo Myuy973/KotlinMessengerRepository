@@ -1,4 +1,4 @@
-package com.simple.messenger.view
+package com.simple.friendship_messenger.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,11 +11,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.simple.messenger.R
-import com.simple.messenger.databinding.FragmentLatestMessagesBinding
-import com.simple.messenger.model.EventObserver
-import com.simple.messenger.model.LatestMessageRow
-import com.simple.messenger.viewModel.UserPageViewModel
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.databinding.FragmentLatestMessagesBinding
+import com.simple.friendship_messenger.model.EventObserver
+import com.simple.friendship_messenger.model.LatestMessageRow
+import com.simple.friendship_messenger.viewModel.UserPageViewModel
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.fragment_latest_messages.*
 import kotlinx.android.synthetic.main.latest_message_row.view.*

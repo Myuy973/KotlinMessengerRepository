@@ -1,4 +1,4 @@
-package com.simple.messenger.model
+package com.simple.friendship_messenger.model
 
 class ChatMessage(val id: String,
                   val text: String,

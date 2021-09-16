@@ -1,4 +1,4 @@
-package com.simple.messenger.view
+package com.simple.friendship_messenger.view
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -12,10 +12,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.simple.messenger.R
-import com.simple.messenger.databinding.FragmentNewMessagesBinding
-import com.simple.messenger.model.UserItem
-import com.simple.messenger.viewModel.UserPageViewModel
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.databinding.FragmentNewMessagesBinding
+import com.simple.friendship_messenger.model.UserItem
+import com.simple.friendship_messenger.viewModel.UserPageViewModel
 import kotlinx.android.synthetic.main.fragment_chat_log.*
 import kotlinx.android.synthetic.main.fragment_new_messages.*
 

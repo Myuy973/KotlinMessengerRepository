@@ -1,4 +1,4 @@
-package com.simple.messenger.view.adapter
+package com.simple.friendship_messenger.view.adapter
 
 import android.graphics.Bitmap
 import androidx.databinding.BindingAdapter

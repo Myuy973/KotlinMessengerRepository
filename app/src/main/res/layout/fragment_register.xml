@@ -7,7 +7,7 @@
     <data>
         <variable
             name="loginviewModel"
-            type="com.simple.messenger.viewModel.LoginViewModel"/>
+            type="com.simple.friendship_messenger.viewModel.LoginViewModel"/>
     </data>
 
     <ScrollView

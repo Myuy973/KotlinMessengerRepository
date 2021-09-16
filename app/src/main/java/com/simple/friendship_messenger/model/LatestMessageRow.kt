@@ -1,11 +1,11 @@
-package com.simple.messenger.model
+package com.simple.friendship_messenger.model
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Color
 import android.view.View
-import com.simple.messenger.R
-import com.simple.messenger.databinding.LatestMessageRowBinding
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.databinding.LatestMessageRowBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

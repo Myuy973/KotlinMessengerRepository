@@ -20,7 +20,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.simple.messenger"
+        applicationId "com.simple.friendship_messenger"
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1

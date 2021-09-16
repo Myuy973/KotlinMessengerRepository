@@ -1,4 +1,4 @@
-package com.simple.messenger
+package com.simple.friendship_messenger
 
 import org.junit.Test
 

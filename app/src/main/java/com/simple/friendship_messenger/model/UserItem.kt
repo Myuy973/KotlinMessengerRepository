@@ -1,7 +1,7 @@
-package com.simple.messenger.model
+package com.simple.friendship_messenger.model
 
-import com.simple.messenger.R
-import com.simple.messenger.databinding.UserRowNewMessageBinding
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.databinding.UserRowNewMessageBinding
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.databinding.BindableItem
 

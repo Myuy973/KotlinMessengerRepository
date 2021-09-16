@@ -1,7 +1,7 @@
-package com.simple.messenger.view
+package com.simple.friendship_messenger.view
 
 import android.content.Intent
-import com.simple.messenger.model.User
+import com.simple.friendship_messenger.model.User
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,9 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simple.messenger.R
-import com.simple.messenger.databinding.FragmentChatLogBinding
-import com.simple.messenger.viewModel.UserPageViewModel
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.databinding.FragmentChatLogBinding
+import com.simple.friendship_messenger.viewModel.UserPageViewModel
 import kotlinx.android.synthetic.main.fragment_chat_log.*
 
 

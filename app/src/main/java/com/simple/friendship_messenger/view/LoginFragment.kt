@@ -1,4 +1,4 @@
-package com.simple.messenger.view
+package com.simple.friendship_messenger.view
 
 import android.content.Context
 import android.content.Intent
@@ -12,10 +12,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simple.messenger.R
-import com.simple.messenger.databinding.FragmentLoginBinding
-import com.simple.messenger.model.EventObserver
-import com.simple.messenger.viewModel.LoginViewModel
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.databinding.FragmentLoginBinding
+import com.simple.friendship_messenger.model.EventObserver
+import com.simple.friendship_messenger.viewModel.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import kotlinx.android.synthetic.main.fragment_login.*
 

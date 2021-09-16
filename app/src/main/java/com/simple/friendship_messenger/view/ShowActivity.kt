@@ -1,13 +1,13 @@
-package com.simple.messenger.view
+package com.simple.friendship_messenger.view
 
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
-import com.simple.messenger.R
-import com.simple.messenger.databinding.ActivityShowBinding
-import com.simple.messenger.viewModel.UserPageViewModel
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.databinding.ActivityShowBinding
+import com.simple.friendship_messenger.viewModel.UserPageViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show.*
 

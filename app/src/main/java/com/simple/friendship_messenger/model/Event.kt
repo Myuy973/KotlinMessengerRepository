@@ -1,4 +1,4 @@
-package com.simple.messenger.model
+package com.simple.friendship_messenger.model
 
 import androidx.lifecycle.Observer
 

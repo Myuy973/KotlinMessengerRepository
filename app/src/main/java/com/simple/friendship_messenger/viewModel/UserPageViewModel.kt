@@ -1,4 +1,4 @@
-package com.simple.messenger.viewModel
+package com.simple.friendship_messenger.viewModel
 
 import android.app.Application
 import android.content.ContentResolver
@@ -10,11 +10,11 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.util.Pair
 import androidx.lifecycle.*
-import com.simple.messenger.R
-import com.simple.messenger.model.*
-import com.simple.messenger.model.chatItem.ChatFromItem
-import com.simple.messenger.model.chatItem.ChatToItem
-import com.simple.messenger.view.*
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.model.*
+import com.simple.friendship_messenger.model.chatItem.ChatFromItem
+import com.simple.friendship_messenger.model.chatItem.ChatToItem
+import com.simple.friendship_messenger.view.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*

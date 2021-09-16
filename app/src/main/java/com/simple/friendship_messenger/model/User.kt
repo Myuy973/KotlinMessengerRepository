@@ -1,4 +1,4 @@
-package com.simple.messenger.model
+package com.simple.friendship_messenger.model
 
 import android.os.Parcelable
 import com.google.firebase.database.IgnoreExtraProperties

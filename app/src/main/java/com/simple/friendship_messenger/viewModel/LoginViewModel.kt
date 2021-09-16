@@ -1,4 +1,4 @@
-package com.simple.messenger.viewModel
+package com.simple.friendship_messenger.viewModel
 
 import android.app.Activity
 import android.app.Application
@@ -9,9 +9,9 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.view.View
 import androidx.lifecycle.*
-import com.simple.messenger.R
-import com.simple.messenger.model.Event
-import com.simple.messenger.model.User
+import com.simple.friendship_messenger.R
+import com.simple.friendship_messenger.model.Event
+import com.simple.friendship_messenger.model.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

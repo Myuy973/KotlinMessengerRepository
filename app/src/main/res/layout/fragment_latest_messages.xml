@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.simple.messenger.viewModel.UserPageViewModel" />
+            type="com.simple.friendship_messenger.viewModel.UserPageViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
